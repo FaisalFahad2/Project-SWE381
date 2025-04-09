@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>View Question</title>
+  <link rel="stylesheet" href="../CSS files/style.css" />
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@200..1000&family=Heebo:wght@100..900&family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap" rel="stylesheet">
+
+</head>
+<body>
+
+  <!-- Header -->
+  <header>
+    <h1>StackClone</h1>
+    <a href="index.html">Home</a>
+    <a href="logout.php">Logout</a>
+  </header>
+
+  <main>
+    <!-- Display Question -->
+    <section class="question">
+      <h2 id="questionTitle">[Question Title]</h2>
+      <p id="questionBody">[Question description from DB]</p>
+
+      <!-- Add comment to question -->
+      <button class="open-comment-modal" data-question-id="101">Comment on Question</button>
+      
+      <!-- Comments on the question -->
+      <div id="questionComments">
+        
+      </div>
+    </section>
+
+    <!-- Answers Section -->
+    <section class="answers">
+      <h3>Answers</h3>
+      <div id="answersContainer">
+        <!-- Loaded answers here -->
+      </div>
+
+      <!-- Add Answer Button -->
+      <button class="open-answer-modal" data-question-id="101">Add Answer</button>
+    </section>
+  </main>
+
+  <!-- Answer Modal -->
+  <div id="answerModal" class="modal" style="display: none;">
+    <div class="modal-content">
+      <span class="close">&times;</span>
+      <h2 id="answerModalTitle">Add/Edit Answer</h2>
+      <form id="answerForm">
+        <input type="hidden" name="question_id" id="questionId">
+        <input type="hidden" name="answer_id" id="answerId">
+        <textarea name="content" id="answerContent" rows="6" required></textarea>
+        <button type="submit">Submit</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Comment Modal -->
+  <div id="commentModal" class="modal" style="display: none;">
+    <div class="modal-content">
+      <span class="close">&times;</span>
+      <h2 id="commentModalTitle">Add/Edit Comment</h2>
+      <form id="commentForm">
+        <input type="hidden" name="question_id" id="commentQuestionId">
+        <input type="hidden" name="answer_id" id="commentAnswerId">
+        <input type="hidden" name="comment_id" id="commentId">
+        <textarea name="content" id="commentContent" rows="4" required></textarea>
+        <button type="submit">Submit</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer>
+    <p>&copy; 2025 StackClone</p>
+  </footer>
+
+  <!-- jQuery Logic -->
+  <script src="js/main.js"></script>
+</body>
+</html>
