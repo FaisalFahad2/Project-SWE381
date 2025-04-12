@@ -199,7 +199,71 @@ form input[type="text"], form input[type="email"], form input[type="password"] {
   margin-bottom: 1rem;
   font-family: var(--font-main);
 }
+/* --------------------
+  Register
+-------------------- */
+.register-form {
+  max-width: 500px;
+  margin: 50px; /* Center the form horizontally */
+  padding: 30px;
+  background-color: #f8f8f8;
+  border-radius: 10px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
 
+.register-form button {
+  width: 100%;
+  padding: 12px;
+  background-color: #FCA311;
+  color: white;
+  font-weight: bold;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.register-form button:hover {
+  background-color: #FCA311;
+}
+
+/* --------------------
+  Login
+-------------------- */
+.login-form {
+  max-width: 400px;
+  margin: 60px auto 0;
+  padding: 30px;
+  background-color: #f8f8f8;
+  border-radius: 10px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.login-form button {
+  width: 100%;
+  padding: 12px;
+  background-color: #2d89ef;
+  color: white;
+  font-weight: bold;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.login-form button:hover {
+  background-color: #1b5dbf;
+}
+
+.forgot-password-link {
+  font-size: 0.9em;
+  color: #2d89ef;
+  text-decoration: none;
+}
+
+.forgot-password-link:hover {
+  text-decoration: underline;
+}
 /* --------------------
   Footer
 -------------------- */
