@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>All Questions</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <!-- Shared header (could be included via server-side include) -->
+  <div id="header">
+    <nav>
+      <a href="index.html">Home</a>
+      <a href="my-questions.html">My Questions</a>
+    </nav>
+  </div>
+
+  <div class="container">
+    <h1>All Questions</h1>
+    <div class="search-bar">
+      <input type="text" id="searchInput" placeholder="Search questions...">
+      <button id="searchBtn">Search</button>
+    </div>
+    
+    <button id="addQuestionBtn" class="add-question">Add Question</button>
+    
+    <ul id="questionList" class="question-list">
+      <!-- Questions will be loaded dynamically via AJAX -->
+    </ul>
+  </div>
+
+  <!-- Add/Edit Question Modal -->
+  <div id="questionModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 id="modalTitle">Add Question</h2>
+        <span id="closeModal" class="close">&times;</span>
+      </div>
+      <div class="modal-body">
+        <form id="questionForm">
+          <input type="hidden" id="questionId" value="">
+          <div class="form-group">
+            <label for="questionTitle">Title:</label>
+            <input type="text" id="questionTitle" name="title" required>
+          </div>
+          <div class="form-group">
+            <label for="questionDescription">Description:</label>
+            <textarea id="questionDescription" name="description" rows="4" required></textarea>
+          </div>
+          <button type="submit" id="submitQuestion">Submit</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/main.js"></script>
+</body>
+</html>

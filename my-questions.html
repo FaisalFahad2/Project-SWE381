@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>My Questions</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div id="header">
+    <nav>
+      <a href="index.html">Home</a>
+      <a href="my-questions.html">My Questions</a>
+    </nav>
+  </div>
+  
+  <div class="container">
+    <h1>My Questions</h1>
+    <ul id="myQuestionList" class="question-list">
+      <!-- User's questions loaded via AJAX -->
+    </ul>
+  </div>
+  
+  <script>
+    // For demo purposes: fetch all questions and filter by a static user_id (e.g., 1)
+    fetch('php/get-question.php')
+      .then(response => response.json())
+      .then(data => {
+        // Make sure your PHP query returns "user_id" as well
+        const myQuestions = data.filter(q => q.user_id == 1); 
+        const list = document.getElementById("myQuestionList");
+        myQuestions.forEach(question => {
+          let li = document.createElement("li");
+          li.innerHTML = `<h3>${question.title}</h3><p>${question.description}</p>`;
+          list.appendChild(li);
+        });
+      });
+  </script>
+</body>
+</html>
