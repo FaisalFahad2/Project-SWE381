@@ -98,7 +98,7 @@ header svg{
 -------------------- */
 main {
   padding: 2rem;
-  max-width: 900px;
+  width: 80%;
   margin: 0 auto;
   background-color: var(--white);
   border-radius: 10px;
@@ -204,7 +204,7 @@ form input[type="text"], form input[type="email"], form input[type="password"] {
 -------------------- */
 .register-form {
   max-width: 500px;
-  margin: 50px; /* Center the form horizontally */
+  justify-self: center;
   padding: 30px;
   background-color: #f8f8f8;
   border-radius: 10px;
@@ -242,7 +242,6 @@ form input[type="text"], form input[type="email"], form input[type="password"] {
 .login-form button {
   width: 100%;
   padding: 12px;
-  background-color: #2d89ef;
   color: white;
   font-weight: bold;
   border: none;
@@ -251,9 +250,7 @@ form input[type="text"], form input[type="email"], form input[type="password"] {
   transition: background-color 0.3s ease;
 }
 
-.login-form button:hover {
-  background-color: #1b5dbf;
-}
+
 
 .forgot-password-link {
   font-size: 0.9em;
@@ -262,6 +259,15 @@ form input[type="text"], form input[type="email"], form input[type="password"] {
 }
 
 .forgot-password-link:hover {
+  text-decoration: underline;
+}
+.register-link {
+  font-size: 0.9em;
+  color: #2d89ef;
+  text-decoration: none;
+}
+
+.register-link:hover {
   text-decoration: underline;
 }
 /* --------------------
