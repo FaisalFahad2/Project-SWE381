@@ -99,6 +99,7 @@ header svg{
 main {
   padding: 2rem;
   width: 80%;
+  text-align: center;
   margin: 0 auto;
   background-color: var(--white);
   border-radius: 10px;
