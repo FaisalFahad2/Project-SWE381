@@ -1,53 +1,53 @@
+/* ../js/main.js  — NEW absolute paths added */
 
-const commentBtn = document.getElementById("commentBtn");
-const commentModal = document.getElementById("commentModal");
+const PROJECT_ROOT = '/Project-SWE381';
+const API_ROOT     = `${PROJECT_ROOT}/php/`;
 
-commentBtn.addEventListener("click", () => {
-  commentModal.style.display = "flex";
-});
+/* ---------- open/close answer & comment modals (unchanged) ---------- */
+const commentBtn  = document.getElementById('commentBtn');
+const commentModal = document.getElementById('commentModal');
+commentBtn.addEventListener('click', () => commentModal.style.display = 'flex');
 
-  
-const answerBtn = document.getElementById("addAnswerBtn");
-const answerModal = document.getElementById("answerModal");
+const answerBtn  = document.getElementById('addAnswerBtn');
+const answerModal = document.getElementById('answerModal');
+answerBtn.addEventListener('click', () => answerModal.style.display = 'flex');
 
-answerBtn.addEventListener("click", () => {
-  answerModal.style.display = "flex";
-});
-
-
-document.addEventListener('click' , (e) => {
-  if(e.target.className === "close"){
-    e.target.parentElement.parentElement.style.display = "none";
+document.addEventListener('click', e => {
+  if (e.target.className === 'close') {
+    e.target.parentElement.parentElement.style.display = 'none';
   }
-})
+});
 
-
-
-
+/* ---------------- load answers & comments ---------------- */
 function loadAnswers(questionId) {
-  const formData = new FormData();
-  formData.append("question_id", questionId);
+  const fd = new FormData();
+  fd.append('question_id', questionId);
 
-  fetch("../php/get-answers-comments.php", {
-    method: "POST",
-    body: formData
+  fetch(`${API_ROOT}get-answers-comments.php`, {  // <— path fixed
+    method: 'POST',
+    body:   fd
   })
-  .then(res => res.json())
+  .then(r => r.json())
   .then(data => {
-    const container = document.getElementById("answersContainer");
-    container.innerHTML = "";
+    const container = document.getElementById('answersContainer');
+    container.innerHTML = '';
 
     data.answers.forEach(answer => {
-      const answerDiv = document.createElement("div");
-      answerDiv.className = "answer";
+      const answerDiv = document.createElement('div');
+      answerDiv.className = 'answer';
       answerDiv.innerHTML = `
         <p><strong>${answer.user}:</strong> ${answer.content}</p>
-        <button class="open-comment-modal" data-answer-id="${answer.id}">Add Comment</button>
+        <button class="open-comment-modal" data-answer-id="${answer.id}">
+          Add Comment
+        </button>
         <div class="comments">
-          ${answer.comments.map(comment => `<p><em>${comment.user}: ${comment.content}</em></p>`).join("")}
+          ${answer.comments
+              .map(c => `<p><em>${c.user}: ${c.content}</em></p>`)
+              .join('')}
         </div>
       `;
       container.appendChild(answerDiv);
     });
-  });
+  })
+  .catch(err => console.error('Error loading answers:', err));
 }
