@@ -1,0 +1,306 @@
+/* --------------------
+  Base Setup
+-------------------- */
+:root {
+  --black: #000000;
+  --dark-blue: #14213D;
+  --orange: #FCA311;
+  --light-gray: #E5E5E5;
+  --white: #FFFFFF;
+
+  --font-main: 'Open Sans', sans-serif;
+  --font-alt: 'Heebo', sans-serif;
+  --font-display: 'Cairo', sans-serif;
+}
+
+html {
+  height: 100%;
+}
+
+body {
+  font-family: var(--font-main);
+  background-color: var(--light-gray);
+  color: var(--dark-blue);
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+header {
+  background-color: var(--dark-blue);
+  color: var(--white);
+  height: 5%;
+  padding: 1rem 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+header a {
+  color: var(--orange);
+  text-decoration: none;
+  margin-left: 1rem;
+  font-weight: bold;
+}
+
+.search-container {
+  display: flex;
+  align-items: center;
+  width: 40%;
+  gap: 8px;
+  margin-left: 20px;
+  margin-right: 20px;
+  
+}
+
+.search-container input[type="text"] {
+  padding: 6px 10px;
+  border: none;
+  width: 90%;
+  border-radius: 5px;
+  font-family: 'Open Sans', sans-serif;
+  font-size: 14px;
+  background-color: #e5e5e5;
+  color: #000000;
+}
+
+.search-container button {
+  padding: 4px 4px;
+  margin: 0;
+  background-color: #fca311;
+  border: none;
+  border-radius: 5px;
+  color: #ffffff;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background-color 0.2s ease;
+}
+
+.search-container button:hover {
+  background-color: #d48f0a;
+}
+.search-container svg{
+  width: 16x;
+  height: 16px;
+  margin: 0;
+}
+
+header svg{
+  width: 25px;
+  height: 25px;
+  margin: 0;
+}
+
+/* --------------------
+  Main Layout
+-------------------- */
+main {
+  padding: 2rem;
+  width: 80%;
+  margin: 0 auto;
+  background-color: var(--white);
+  border-radius: 10px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+  flex: 1;
+}
+
+/* --------------------
+  Questions / Answers
+-------------------- */
+.answer {
+  padding: 15px 10px;
+  border-bottom: 1px solid #ccc; /* الخط الفاصل */
+  margin-bottom: 10px;
+}
+
+.answer:last-child {
+  border-bottom: none; /* نحذف الخط من آخر إجابة */
+}
+
+.question, .answers {
+  margin-bottom: 2rem;
+}
+
+.question h2, .answers h3 {
+  font-family: var(--font-display);
+  color: var(--black);
+}
+
+p {
+  line-height: 1.6;
+}
+
+
+
+/* --------------------
+  Buttons
+-------------------- */
+button {
+  background-color: var(--orange);
+  color: var(--white);
+  border: none;
+  padding: 0.6rem 1.2rem;
+  border-radius: 5px;
+  cursor: pointer;
+  font-family: var(--font-alt);
+  font-size: 1rem;
+  margin-top: 1rem;
+}
+
+button:hover {
+  background-color: #e5940f;
+}
+
+/* --------------------
+  Modal Styling
+-------------------- */
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0,0,0,0.6);
+  display: none;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  transition: opacity 0.3s ease;
+}
+
+.modal-content {
+  background-color: var(--white);
+  padding: 2rem;
+  border-radius: 10px;
+  width: 90%;
+  max-width: 500px;
+  position: relative;
+}
+
+.close {
+  position: absolute;
+  top: 10px;
+  right: 15px;
+  font-size: 1.4rem;
+  cursor: pointer;
+  color: var(--dark-blue);
+}
+
+/* --------------------
+  Forms
+-------------------- */
+form{
+  padding-right: 10px;
+}
+form textarea {
+  width: 100%;
+  padding: 1rem;
+  border: 1px solid var(--light-gray);
+  border-radius: 5px;
+  margin-bottom: 1rem;
+  font-family: var(--font-main);
+}
+
+form input[type="text"], form input[type="email"], form input[type="password"] {
+  width: 100%;
+  padding: 0.8rem;
+  border: 1px solid var(--light-gray);
+  border-radius: 5px;
+  margin-bottom: 1rem;
+  font-family: var(--font-main);
+}
+/* --------------------
+  Register
+-------------------- */
+.register-form {
+  max-width: 500px;
+  justify-self: center;
+  padding: 30px;
+  background-color: #f8f8f8;
+  border-radius: 10px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.register-form button {
+  width: 100%;
+  padding: 12px;
+  background-color: #FCA311;
+  color: white;
+  font-weight: bold;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.register-form button:hover {
+  background-color: #FCA311;
+}
+
+/* --------------------
+  Login
+-------------------- */
+.login-form {
+  max-width: 400px;
+  margin: 60px auto 0;
+  padding: 30px;
+  background-color: #f8f8f8;
+  border-radius: 10px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.login-form button {
+  width: 100%;
+  padding: 12px;
+  color: white;
+  font-weight: bold;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+
+
+.forgot-password-link {
+  font-size: 0.9em;
+  color: #2d89ef;
+  text-decoration: none;
+}
+
+.forgot-password-link:hover {
+  text-decoration: underline;
+}
+.register-link {
+  font-size: 0.9em;
+  color: #2d89ef;
+  text-decoration: none;
+}
+
+.register-link:hover {
+  text-decoration: underline;
+}
+/* --------------------
+  Footer
+-------------------- */
+footer {
+  display: flex;
+  justify-content: center;
+  text-align: center;
+  padding: 1rem;
+  height: 5%;
+  background-color: var(--dark-blue);
+  color: var(--white);
+  margin-top: 2rem;
+}
+footer svg{
+  margin: 16px;
+  margin-right: 0;
+  width: 16px;
+  height: 16px;
+}
+footer p{
+  margin-top:10px ;
+}
