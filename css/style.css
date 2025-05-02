@@ -271,6 +271,37 @@ form input[type="text"], form input[type="email"], form input[type="password"] {
   text-decoration: underline;
 }
 /* --------------------
+  Profile
+-------------------- */
+.profile-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px;
+  background-color: #f8f8f8;
+  border-radius: 10px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.profile-container h2 {
+  margin-bottom: 20px;
+  font-family: var(--font-display);
+  }
+
+.profile-container a {
+  text-decoration: none;
+  color: var(--dark-blue);
+  font-weight: bold;
+  margin-top: 10px;
+  font-family: var(--font-alt);
+  font-size: 1rem;
+}
+.profile-container a:hover{
+  color: #d48f0a;
+
+}
+
+/* --------------------
   Footer
 -------------------- */
 footer {
@@ -292,3 +323,5 @@ footer svg{
 footer p{
   margin-top:10px ;
 }
+
+

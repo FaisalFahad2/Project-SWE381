@@ -1,3 +1,24 @@
+
+<?php
+session_start();
+require_once '../php/db.php';
+
+// Check if user is logged in
+if (!isset($_SESSION['user_id'])) {
+    header("Location: login.php");
+    exit();
+}
+
+// Get database connection
+$db = Database::getInstance();
+$conn = $db->getConnection();
+
+// Fetch user data
+$stmt = $conn->prepare("SELECT * FROM users WHERE id = ?");
+$stmt->bind_param("i", $_SESSION['user_id']);
+$stmt->execute();
+$user = $stmt->get_result()->fetch_assoc();
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -18,14 +39,19 @@
   <main>
     <div class="profile-container">
       <h2>Profile info</h2>
-      <p><strong>First Name:</strong> <span id="firstname">Loading...</span></p>
-      <p><strong>Last Name:</strong> <span id="lastname">Loading...</span></p>
-      <p><strong>Email:</strong> <span id="email">Loading...</span></p>
-      <p><strong>Phone:</strong> <span id="phone">Loading...</span></p>
+      <p><strong>Username:</strong> <span id="username"><?php echo htmlspecialchars($user['username']); ?></span></p>
+<p><strong>First Name:</strong> <span id="firstname"><?php echo htmlspecialchars($user['firstname']); ?></span></p>
+<p><strong>Last Name:</strong> <span id="lastname"><?php echo htmlspecialchars($user['lastname']); ?></span></p>
+<p><strong>Email:</strong> <span id="email"><?php echo htmlspecialchars($user['email']); ?></span></p>
+<p><strong>Phone:</strong> <span id="phone"><?php echo htmlspecialchars($user['phone']); ?></span></p>
 
-      <h2>My Answers</h2>
-
+    <a href="my-questions.html">
       <h2>My Questions</h2>
+    </a>
+
+    <a href="my-answers.html">
+      <h2>My Answers</h2>
+    </a>
 
       <a href="logout.php">
         <button>Logout</button>
