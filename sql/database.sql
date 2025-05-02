@@ -5,7 +5,7 @@ USE stackclone;
 -- USERS TABLE
 CREATE TABLE users (
     id INT(11) AUTO_INCREMENT PRIMARY KEY,
-    firstname VARCHAR(50) NOT NULL
+    firstname VARCHAR(50) NOT NULL,
     lastname VARCHAR(50) NOT NULL,
     username VARCHAR(50) NOT NULL UNIQUE,
     email VARCHAR(100) NOT NULL UNIQUE,
