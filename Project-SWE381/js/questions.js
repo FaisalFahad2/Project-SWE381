@@ -1,0 +1,151 @@
+/* ../js/questions.js */
+
+/*
+ *  Set this constant to the folder that sits directly under http://localhost/
+ *  In your case (see the Network tab: “…/Project-SWE381/html%20files/…”)
+ *  that folder is “Project-SWE381”.
+ */
+// const PROJECT_ROOT = '/Project-SWE381';   //  ← change if your project folder is named differently
+// const API_ROOT     = `${PROJECT_ROOT}/php/`;   // → resolves to /Project-SWE381/php/...
+
+/* ───────────────────────────────────────────────────────── */
+
+document.addEventListener('DOMContentLoaded', function() {
+  // Load questions on page load
+  loadQuestions();
+
+  // Modal elements
+  const modal = document.getElementById("questionModal");
+  const addBtn = document.getElementById("addQuestionBtn");
+  const closeModal = document.getElementById("closeModal");
+  const questionForm = document.getElementById("questionForm");
+
+  // Open modal on "Add Question" button click
+  addBtn.addEventListener('click', function() {
+    document.getElementById("modalTitle").textContent = "Add Question";
+    questionForm.reset();
+    document.getElementById("questionId").value = "";
+    document.body.style.overflow = "hidden";
+    modal.style.display = "flex";  // Use "flex" so align-items & justify-content center
+  });
+
+  // Close modal when clicking the close icon
+  closeModal.addEventListener('click', function() {
+    modal.style.display = "none";
+    document.body.style.overflow = "auto";
+  });
+
+  window.addEventListener('click', function(event) {
+    if (event.target === modal) {
+      modal.style.display = "none";
+      document.body.style.overflow = "auto";
+    }
+  });
+
+  // Handle form submission (for add/edit)
+  questionForm.addEventListener('submit', function(e) {
+    e.preventDefault();
+
+    let questionId = document.getElementById("questionId").value;
+    let title = document.getElementById("questionTitle").value;
+    let description = document.getElementById("questionDescription").value;
+    
+    let formData = new FormData();
+    formData.append('title', title);
+    formData.append('description', description);
+
+        /* ----- add ----- */
+        if (!id) {
+          fetch(`/Project-SWE381/php/submit-question.php`, { method: 'POST', body: fd })
+            .then(r => r.json())
+            .then(({ success, message }) => {
+              if (success) {
+                modal.style.display = 'none';
+                document.body.style.overflow = 'auto';
+                loadQuestions();
+              } else {
+                alert(message || 'Could not add question.');
+              }
+            })
+            .catch(err => {
+              console.error(err);
+              alert('Network / server error – check console.');
+            });
+          return;
+        }
+    
+        /* ----- edit ----- */
+        fd.append('id', id);
+        fetch(`/Project-SWE381/php/edit-question.php`, { method: 'POST', body: fd })
+          .then(r => r.text())
+          .then(() => {
+            modal.style.display = 'none';
+            document.body.style.overflow = 'auto';
+            loadQuestions();
+          })
+          .catch(err => {
+            console.error(err);
+            alert('Network / server error – check console.');
+          });
+      });
+    
+      /* search */
+      document.getElementById('searchBtn').addEventListener('click', () => {
+        const term = document.getElementById('searchInput').value;
+        loadQuestions(term);
+      });
+    });
+    
+    /* ------------ helpers ------------ */
+    function loadQuestions(term = '') {
+      let url = `/Project-SWE381/php/get-question.php`;
+      if (term) url += `?search=${encodeURIComponent(term)}`;
+    
+      fetch(url)
+        .then(r => r.json())
+        .then(data => {
+          const list = document.getElementById('questionList');
+          list.innerHTML = '';
+          data.forEach(q => {
+            const li = document.createElement('li');
+            li.innerHTML = `
+              <h3>${q.title}</h3>
+              <p>${q.description}</p>
+              <button onclick="editQuestion(${q.id})">Edit</button>
+              <button onclick="deleteQuestion(${q.id})">Delete</button>
+            `;
+            list.appendChild(li);
+          });
+        })
+        .catch(err => console.error('Error loading questions:', err));
+    }
+    
+    function editQuestion(id) {
+      const fd = new FormData();
+      fd.append('id', id);
+    
+      fetch(`/Project-SWE381/php/get-question.php`, { method: 'POST', body: fd })
+        .then(r => r.json())
+        .then(q => {
+          document.getElementById('modalTitle').textContent           = 'Edit Question';
+          document.getElementById('questionId').value                 = q.id;
+          document.getElementById('questionTitle').value              = q.title;
+          document.getElementById('questionDescription').value        = q.description;
+          document.body.style.overflow = 'hidden';
+          document.getElementById('questionModal').style.display = 'flex';
+        });
+    }
+    
+    function deleteQuestion(id) {
+      if (!confirm('Delete this question?')) return;
+    
+      const fd = new FormData();
+      fd.append('id', id);
+    
+      fetch(`/Project-SWE381/php/delete-question.php`, { method: 'POST', body: fd })
+        .then(() => loadQuestions())
+        .catch(err => {
+          console.error(err);
+          alert('Network / server error – check console.');
+        });
+    }

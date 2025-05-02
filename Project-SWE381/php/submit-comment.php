@@ -1,0 +1,27 @@
+<?php
+session_start();
+include 'db.php';
+
+if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+    if (!isset($_SESSION['user_id'])) {
+        echo json_encode(['error' => 'User must be logged in']);
+        exit;
+    }
+
+    $content = $_POST['content'] ?? '';
+    $user_id = $_SESSION['user_id'];
+    $question_id = $_POST['question_id'] ?? null;
+    $answer_id = $_POST['answer_id'] ?? null;
+
+    $stmt = $conn->prepare("INSERT INTO comments (question_id, answer_id, user_id, content) VALUES (?, ?, ?, ?)");
+    $stmt->bind_param("iiis", $question_id, $answer_id, $user_id, $content);
+    
+    if ($stmt->execute()) {
+        echo json_encode(['success' => 'Comment added successfully']);
+    } else {
+        echo json_encode(['error' => $stmt->error]);
+    }
+    $stmt->close();
+}
+$conn->close();
+?>
