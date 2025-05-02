@@ -99,7 +99,6 @@ header svg{
 main {
   padding: 2rem;
   width: 80%;
-  text-align: center;
   margin: 0 auto;
   background-color: var(--white);
   border-radius: 10px;
@@ -110,6 +109,16 @@ main {
 /* --------------------
   Questions / Answers
 -------------------- */
+.answer {
+  padding: 15px 10px;
+  border-bottom: 1px solid #ccc; /* الخط الفاصل */
+  margin-bottom: 10px;
+}
+
+.answer:last-child {
+  border-bottom: none; /* نحذف الخط من آخر إجابة */
+}
+
 .question, .answers {
   margin-bottom: 2rem;
 }

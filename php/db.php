@@ -2,8 +2,8 @@
 // db.php
 $host = 'localhost';
 $username = 'root';
-$password = 'helloMyDB';
-$dbname = 'stackoverflow_clone';
+$password = '';
+$dbname = 'stackclone';
 
 $conn = new mysqli($host, $username, $password, $dbname);
 if ($conn->connect_error) {

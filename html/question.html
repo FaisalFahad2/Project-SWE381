@@ -5,7 +5,6 @@
   <title>View Question</title>
   <link rel="stylesheet" href="../css/style.css" />
   
-
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@200..1000&family=Heebo:wght@100..900&family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap" rel="stylesheet">
@@ -21,12 +20,6 @@
         <path d="M8.707 1.5a1 1 0 0 0-1.414 0L.646 8.146a.5.5 0 0 0 .708.708L2 8.207V13.5A1.5 1.5 0 0 0 3.5 15h9a1.5 1.5 0 0 0 1.5-1.5V8.207l.646.647a.5.5 0 0 0 .708-.708L13 5.793V2.5a.5.5 0 0 0-.5-.5h-1a.5.5 0 0 0-.5.5v1.293zM13 7.207V13.5a.5.5 0 0 1-.5.5h-9a.5.5 0 0 1-.5-.5V7.207l5-5z"/>
       </svg>
     </a>
-
-    <!--<a href="my-answers.html">
-      my answers
-    </a>
-    add by js
-  -->
 
     <div class="search-container">
       <input type="text" id="searchInput" placeholder="Search questions..." />
@@ -44,28 +37,24 @@
     <section class="question">
       <h2 id="questionTitle">[Question Title]</h2>
       <p id="questionBody">[Question description from DB]</p>
-
       
       <button class="open-comment-modal" data-question-id="101" id="commentBtn">Comment on Question</button>
       
-      
       <div id="questionComments">
-        
       </div>
     </section>
 
     <section class="answers">
       <h3>Answers</h3>
+
       <div id="answersContainer">
         
       </div>
 
-      
       <button class="open-answer-modal" data-question-id="101" id="addAnswerBtn">Add Answer</button>
     </section>
   </main>
 
-  
   <div id="answerModal" class="modal">
     <div class="modal-content">
       <span class="close">&times;</span>
@@ -79,7 +68,6 @@
     </div>
   </div>
 
-  
   <div id="commentModal" class="modal">
     <div class="modal-content">
       <span class="close">&times;</span>
@@ -93,7 +81,6 @@
       </form>
     </div>
   </div>
-
   
   <footer>
     <p>&copy; 2025 StackClone</p>
@@ -106,7 +93,9 @@
     </svg>
   </footer>
 
-  
+  <script src="../js/search.js"></script>
+  <script src="../js/vote.js"></script>
   <script src="../js/main.js"></script>
+  
 </body>
 </html>

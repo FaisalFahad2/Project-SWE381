@@ -1,19 +1,25 @@
 <?php
-// submit-question.php
+session_start();
 include 'db.php';
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+    // Check if user is logged in
+    if (!isset($_SESSION['user_id'])) {
+        echo json_encode(['error' => 'User must be logged in']);
+        exit;
+    }
+
     $title = $_POST['title'] ?? '';
     $description = $_POST['description'] ?? '';
-    // In a real app, get user_id from session; here we use a static user_id
-    $user_id = 1;
+    $user_id = $_SESSION['user_id'];
 
-    $stmt = $conn->prepare("INSERT INTO questions (user_id, title, description, created_at) VALUES (?, ?, ?, NOW())");
+    $stmt = $conn->prepare("INSERT INTO questions (user_id, title, description) VALUES (?, ?, ?)");
     $stmt->bind_param("iss", $user_id, $title, $description);
+    
     if ($stmt->execute()) {
-        echo "Question added successfully";
+        echo json_encode(['success' => 'Question added successfully']);
     } else {
-        echo "Error: " . $stmt->error;
+        echo json_encode(['error' => $stmt->error]);
     }
     $stmt->close();
 }
