@@ -33,7 +33,6 @@ CREATE TABLE answers (
   question_id INT NOT NULL,
   user_id INT NOT NULL,
   content TEXT NOT NULL,
-  total_score INT DEFAULT 0, -- +1 for upvote, -1 for downvote, stored directly
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   FOREIGN KEY (question_id) REFERENCES questions(id) ON DELETE CASCADE,
   FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
@@ -55,3 +54,15 @@ CREATE TABLE comments (
     (question_id IS NULL AND answer_id IS NOT NULL)
   )
 );
+
+
+
+CREATE TABLE votes ( id INT AUTO_INCREMENT PRIMARY KEY, 
+user_id INT NOT NULL, 
+answer_id INT NOT NULL, 
+vote_type ENUM('up', 'down') NOT NULL, 
+created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, 
+UNIQUE KEY unique_vote (user_id, answer_id), 
+FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE, 
+FOREIGN KEY (answer_id) REFERENCES answers(id) ON DELETE CASCADE );
+

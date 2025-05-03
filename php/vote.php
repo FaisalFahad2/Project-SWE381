@@ -1,7 +1,8 @@
 <?php
 header('Content-Type: application/json');
 require_once 'db.php';
-
+$db = Database::getInstance();
+$conn = $db->getConnection();
 // session_start();
 $answerId = $_POST['answer_id'];
 $voteType = $_POST['vote_type']; 

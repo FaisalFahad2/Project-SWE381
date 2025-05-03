@@ -1,6 +1,7 @@
 <?php
 require_once 'db.php';
-
+$db = Database::getInstance();
+$conn = $db->getConnection();
 if (isset($_GET['search'])) {
     $search = $conn->real_escape_string($_GET['search']);
     $sql = "SELECT id, user_id, title, description, created_at FROM questions WHERE title LIKE '%$search%' OR description LIKE '%$search%'";

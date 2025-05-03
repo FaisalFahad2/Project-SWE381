@@ -1,6 +1,9 @@
 <?php
 include 'db.php';
 
+$db = Database::getInstance();
+$conn = $db->getConnection();
+
 $questionId = isset($_GET['question_id']) ? intval($_GET['question_id']) : 0;
 
 if ($questionId > 0) {

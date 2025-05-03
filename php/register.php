@@ -1,6 +1,9 @@
 
 <?php
 session_start();
+session_unset();
+session_destroy();
+session_start(); 
 include 'db.php';
 
 $conn = Database::getInstance()->getConnection();

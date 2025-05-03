@@ -2,6 +2,9 @@
 session_start();
 include 'db.php';
 
+$db = Database::getInstance();
+$conn = $db->getConnection();
+
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     if (!isset($_SESSION['user_id'])) {
         echo json_encode(['error' => 'User must be logged in']);

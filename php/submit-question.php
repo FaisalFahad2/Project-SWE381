@@ -1,7 +1,8 @@
 <?php
 session_start();
 include 'db.php';
-
+$db = Database::getInstance();
+$conn = $db->getConnection();
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     // Check if user is logged in
     if (!isset($_SESSION['user_id'])) {

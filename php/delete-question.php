@@ -1,7 +1,8 @@
 <?php
 // delete-question.php
 include 'db.php';
-
+$db = Database::getInstance();
+$conn = $db->getConnection();
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['id'])) {
     $id = $_POST['id'];
     $stmt = $conn->prepare("DELETE FROM questions WHERE id = ?");

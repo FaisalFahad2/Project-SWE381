@@ -1,6 +1,8 @@
 <?php
 // get-question.php
 include 'db.php';
+$db = Database::getInstance();
+$conn = $db->getConnection();
 header('Content-Type: application/json');
 
 // If a POST request with an 'id' is sent, return a single question
