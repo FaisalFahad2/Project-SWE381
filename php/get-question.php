@@ -1,9 +1,10 @@
 <?php
 // get-question.php
 include 'db.php';
+header('Content-Type: application/json');
+
 $db = Database::getInstance();
 $conn = $db->getConnection();
-header('Content-Type: application/json');
 
 // If a POST request with an 'id' is sent, return a single question
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['id'])) {
@@ -15,7 +16,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['id'])) {
     $question = $result->fetch_assoc();
     echo json_encode($question);
     $stmt->close();
-    $conn->close();
     exit;
 }
 
@@ -41,5 +41,3 @@ while ($row = $result->fetch_assoc()) {
 }
 echo json_encode($questions);
 $stmt->close();
-$conn->close();
-?>

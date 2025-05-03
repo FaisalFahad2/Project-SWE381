@@ -2,9 +2,10 @@
 class Database {
     private static $instance = null;
     private $connection;
+    private $isConnected = false;
     
     private function __construct() {
-        $host = 'localhost:3307'; // Adjust the port if necessary
+        $host = 'localhost:3306'; // Adjust the port if necessary
         $username = 'root';
         $password = '';
         $dbname = 'stackclone';
@@ -26,6 +27,7 @@ class Database {
         
         // Set charset to UTF-8
         $this->connection->set_charset('utf8mb4');
+        $this->isConnected = true;
     }
 
     // Prevent cloning of the instance
@@ -44,6 +46,9 @@ class Database {
     }
 
     public function getConnection() {
+        if (!$this->isConnected) {
+            $this->__construct();
+        }
         return $this->connection;
     }
     
@@ -91,10 +96,17 @@ class Database {
         $this->connection->rollback();
     }
 
-    public function __destruct() {
-        if ($this->connection) {
+    public function close() {
+        if ($this->isConnected && $this->connection) {
             $this->connection->close();
+            $this->isConnected = false;
+            self::$instance = null; // Reset the singleton instance
         }
+    }
+
+    public function __destruct() {
+        // Don't close the connection in destructor
+        // Let PHP handle the cleanup
     }
 }
 ?>
