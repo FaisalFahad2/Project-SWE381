@@ -4,34 +4,12 @@
   <meta charset="UTF-8">
   <title>My Questions</title>
   <link rel="stylesheet" href="../css/style.css">
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@200..1000&family=Heebo:wght@100..900&family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap" rel="stylesheet">
 </head>
 <body>
-
-  <script>
-    window.onload = function() {
-      fetch('../php/check_session.php')
-        .then(response => response.json())
-        .then(data => {
-          const userLink = document.getElementById('userLink');
-    
-          if (!data.logged_in) {
-            // Not logged in: if on index, redirect to login
-            if (window.location.pathname.indexOf('index.html') !== -1) {
-              window.location.href = 'login.html';
-            }
-          } else {
-            // Logged in: change the Login link to Profile link
-            if (userLink) {
-              userLink.href = '../php/profile.php'; // Redirect to profile page
-              userLink.textContent = 'Profile';     // Change link text to "Profile"
-            }
-          }
-        })
-        .catch(error => {
-          console.error('Error checking session:', error);
-        });
-    };
-    </script>
   <header>
     <h1>StackClone</h1>
   
@@ -50,17 +28,16 @@
       </svg>
     </a>
 
-    <a href="../php/profile.php">Profile</a>
-
+    <a href="../php/profile.php" id="userLink">Profile</a>
   </header>
   
   <main>
-  <div class="container">
-    <h1>My Questions</h1>
-    <ul id="myQuestionList" class="question-list">
-      <!-- User's questions loaded via AJAX -->
-    </ul>
-  </div>
+    <div class="container">
+      <h1>My Questions</h1>
+      <div id="myQuestionList" class="question-list">
+        <p class="loading">Loading your questions...</p>
+      </div>
+    </div>
   </main>
   
   <footer>
@@ -75,19 +52,94 @@
   </footer>
   
   <script>
-    // For demo purposes: fetch all questions and filter by a static user_id (e.g., 1)
-    fetch('php/get-question.php')
+    // Check session and redirect if not logged in
+    fetch('../php/check_session.php')
       .then(response => response.json())
       .then(data => {
-        // Make sure your PHP query returns "user_id" as well
-        const myQuestions = data.filter(q => q.user_id == 1); 
-        const list = document.getElementById("myQuestionList");
-        myQuestions.forEach(question => {
-          let li = document.createElement("li");
-          li.innerHTML = `<h3>${question.title}</h3><p>${question.description}</p>`;
-          list.appendChild(li);
-        });
+        if (!data.logged_in) {
+          window.location.href = 'login.html';
+          return;
+        }
+        loadMyQuestions();
+      })
+      .catch(error => {
+        console.error('Error checking session:', error);
       });
+
+    function formatDate(dateString) {
+      if (!dateString) return "Unknown date";
+      const date = new Date(dateString);
+      if (isNaN(date)) return "Unknown date";
+      return date.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+    }
+
+    function loadMyQuestions() {
+      fetch('../php/get-my-questions.php')
+        .then(response => response.json())
+        .then(questions => {
+          const container = document.getElementById('myQuestionList');
+          container.innerHTML = ''; // Clear loading message
+
+          if (questions.length === 0) {
+            container.innerHTML = '<p class="no-questions">You haven\'t asked any questions yet.</p>';
+            return;
+          }
+
+          questions.forEach(question => {
+            const questionDiv = document.createElement('div');
+            questionDiv.className = 'question-item';
+            questionDiv.innerHTML = `
+              <h3><a href="question.html?id=${question.id}">${question.title}</a></h3>
+              <p class="description">${question.description}</p>
+              <div class="question-stats">
+                <span>${question.answer_count} answers</span>
+                <span>${question.comment_count} comments</span>
+                <span>Posted on ${formatDate(question.created_at)}</span>
+              </div>
+              <div class="question-actions">
+                <button onclick="editQuestion(${question.id})" class="edit-btn">Edit</button>
+                <button onclick="deleteQuestion(${question.id})" class="delete-btn">Delete</button>
+              </div>
+            `;
+            container.appendChild(questionDiv);
+          });
+        })
+        .catch(error => {
+          console.error('Error loading questions:', error);
+          document.getElementById('myQuestionList').innerHTML = 
+            '<p class="error">Error loading your questions. Please try again later.</p>';
+        });
+    }
+
+    function editQuestion(id) {
+      window.location.href = `question.html?id=${id}&edit=true`;
+    }
+
+    function deleteQuestion(id) {
+      if (!confirm('Are you sure you want to delete this question?')) {
+        return;
+      }
+
+      const formData = new FormData();
+      formData.append('id', id);
+
+      fetch('../php/delete-question.php', {
+        method: 'POST',
+        body: formData
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          loadMyQuestions(); // Reload the list
+        } else {
+          alert(data.message || 'Error deleting question');
+        }
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        alert('Error deleting question');
+      });
+    }
   </script>
 </body>
 </html>

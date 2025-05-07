@@ -36,6 +36,9 @@ header {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  position: sticky;
+  top: 0;
+  z-index: 100;
 }
 
 header a {
@@ -343,4 +346,104 @@ footer p{
   margin: 20px 0;
   text-align: center;
   font-weight: bold;
+}
+
+/* My Questions and My Answers Pages */
+.question-list, .answers-list {
+  margin: 20px 0;
+}
+
+.question-item, .answer-item {
+  background-color: #fff;
+  border: 1px solid #e1e4e8;
+  border-radius: 6px;
+  margin: 15px 0;
+  padding: 20px;
+}
+
+.question-item h3, .answer-item h3 {
+  margin: 0 0 10px 0;
+  color: #24292e;
+}
+
+.question-item h3 a, .answer-item h3 a {
+  color: #0366d6;
+  text-decoration: none;
+}
+
+.question-item h3 a:hover, .answer-item h3 a:hover {
+  text-decoration: underline;
+}
+
+.question-stats, .answer-stats {
+  margin: 10px 0;
+  color: #586069;
+  font-size: 0.9em;
+}
+
+.question-stats span, .answer-stats span {
+  margin-right: 15px;
+}
+
+.question-actions, .answer-actions {
+  margin-top: 15px;
+  display: flex;
+  gap: 10px;
+}
+
+.edit-btn, .delete-btn {
+  padding: 5px 15px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.9em;
+  border: 1px solid;
+}
+
+.edit-btn {
+  background-color: #fafbfc;
+  border-color: #1b1f2326;
+  color: #24292e;
+}
+
+.delete-btn {
+  background-color: #fafbfc;
+  border-color: #cb2431;
+  color: #cb2431;
+}
+
+.edit-btn:hover {
+  background-color: #f3f4f6;
+}
+
+.delete-btn:hover {
+  background-color: #cb2431;
+  color: #fff;
+}
+
+.loading, .no-questions, .no-answers, .error {
+  text-align: center;
+  padding: 20px;
+  color: #586069;
+}
+
+.error {
+  color: #cb2431;
+}
+
+.description {
+  color: #24292e;
+  margin: 10px 0;
+  line-height: 1.5;
+}
+
+/* Question Title in Answer Items */
+.question-title {
+  margin-bottom: 15px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #e1e4e8;
+}
+
+.answer-content {
+  color: #24292e;
+  line-height: 1.5;
 }

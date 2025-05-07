@@ -12,25 +12,25 @@ $db = Database::getInstance();
 $conn = $db->getConnection();
 $user_id = $_SESSION['user_id'];
 
-$query = "SELECT a.*, q.title as question_title, 
-          (SELECT COUNT(*) FROM comments WHERE answer_id = a.id) as comment_count
-          FROM answers a 
-          JOIN questions q ON a.question_id = q.id 
-          WHERE a.user_id = ? 
-          ORDER BY a.created_at DESC";
+$query = "SELECT q.*, 
+          (SELECT COUNT(*) FROM answers WHERE question_id = q.id) as answer_count,
+          (SELECT COUNT(*) FROM comments WHERE question_id = q.id) as comment_count
+          FROM questions q 
+          WHERE q.user_id = ? 
+          ORDER BY q.created_at DESC";
 
 $stmt = $conn->prepare($query);
 $stmt->bind_param("i", $user_id);
 $stmt->execute();
 $result = $stmt->get_result();
 
-$answers = [];
+$questions = [];
 while ($row = $result->fetch_assoc()) {
-    $answers[] = $row;
+    $questions[] = $row;
 }
 
-echo json_encode($answers);
+echo json_encode($questions);
 
 $stmt->close();
 $conn->close();
-?>
+?> 

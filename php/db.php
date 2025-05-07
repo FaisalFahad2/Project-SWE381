@@ -5,9 +5,9 @@ class Database {
     private $isConnected = false;
     
     private function __construct() {
-        $host = 'localhost'; // Adjust the port if necessary
+        $host = 'localhost:3306'; // Adjust the port if necessary
         $username = 'root';
-        $password = '';
+        $password = 'Ffma0000';
         $dbname = 'stackclone';
         
         // Create connection

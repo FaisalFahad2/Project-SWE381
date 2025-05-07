@@ -22,15 +22,38 @@ try {
     $voteType = $_POST['vote_type'];
     $userId = $_SESSION['user_id'];
 
-    $deleteStmt = $conn->prepare("DELETE FROM votes WHERE user_id = ? AND answer_id = ?");
-    $deleteStmt->bind_param("ii", $userId, $answerId);
-    $deleteStmt->execute();
-    $deleteStmt->close();
+    $voteType = strtolower(trim($voteType));
+    if ($voteType !== 'up' && $voteType !== 'down') {
+        echo json_encode(['status' => 'error', 'message' => 'Invalid vote type']);
+        exit;
+    }
 
-    $insertStmt = $conn->prepare("INSERT INTO votes (user_id, answer_id, vote_type) VALUES (?, ?, ?)");
-    $insertStmt->bind_param("iis", $userId, $answerId, $voteType);
-    $insertStmt->execute();
-    $insertStmt->close();
+    // Check if the user already voted and what type
+    $checkStmt = $conn->prepare("SELECT vote_type FROM votes WHERE user_id = ? AND answer_id = ?");
+    $checkStmt->bind_param("ii", $userId, $answerId);
+    $checkStmt->execute();
+    $checkStmt->bind_result($existingVoteType);
+    $hasVote = $checkStmt->fetch();
+    $checkStmt->close();
+
+    if ($hasVote && strtolower($existingVoteType) == $voteType) {
+        // User clicked the same vote again, so remove (cancel) the vote
+        $deleteStmt = $conn->prepare("DELETE FROM votes WHERE user_id = ? AND answer_id = ?");
+        $deleteStmt->bind_param("ii", $userId, $answerId);
+        $deleteStmt->execute();
+        $deleteStmt->close();
+    } else {
+        // Remove any previous vote
+        $deleteStmt = $conn->prepare("DELETE FROM votes WHERE user_id = ? AND answer_id = ?");
+        $deleteStmt->bind_param("ii", $userId, $answerId);
+        $deleteStmt->execute();
+        $deleteStmt->close();
+        // Insert new vote
+        $insertStmt = $conn->prepare("INSERT INTO votes (user_id, answer_id, vote_type) VALUES (?, ?, ?)");
+        $insertStmt->bind_param("iis", $userId, $answerId, $voteType);
+        $insertStmt->execute();
+        $insertStmt->close();
+    }
 
     $ratingQuery = "SELECT SUM(CASE WHEN vote_type = 'up' THEN 1 WHEN vote_type = 'down' THEN -1 ELSE 0 END) as rating FROM votes WHERE answer_id = ?";
     $ratingStmt = $conn->prepare($ratingQuery);
