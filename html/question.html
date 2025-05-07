@@ -75,6 +75,7 @@
       <h2 id="commentModalTitle">Add Comment</h2>
       <form id="commentForm">
         <input type="hidden" name="question_id" id="commentQuestionId">
+        <input type="hidden" name="answer_id" id="commentAnswerId">
         <textarea name="content" id="commentContent" rows="4" required></textarea>
         <button type="submit">Submit</button>
       </form>
@@ -258,6 +259,10 @@
                   ${answer.comments.map(comment => `<p><em>${comment.user}: ${comment.content}</em></p>`).join("")}
                 </div>
                 <button class="open-comment-modal" data-answer-id="${answer.id}">Add Comment</button>
+                ${answer.is_owner ? `
+                  <button class="edit-answer-btn" data-answer-id="${answer.id}">Edit</button>
+                  <button class="delete-answer-btn" data-answer-id="${answer.id}">Delete</button>
+                ` : ''}
               `;
               container.appendChild(answerDiv);
             });
@@ -267,6 +272,86 @@
           } else {
             container.innerHTML = "<p>No answers yet. Be the first to answer!</p>";
           }
+        }
+
+        // Add JS handlers for edit and delete
+        container.querySelectorAll('.edit-answer-btn').forEach(btn => {
+          btn.onclick = function() {
+            const answerId = btn.getAttribute('data-answer-id');
+            const answerDiv = btn.closest('.answer');
+            const contentP = answerDiv.querySelector('p strong') ? answerDiv.querySelector('p strong').parentNode : answerDiv.querySelector('p');
+            const oldContent = contentP.textContent.replace(/^.*?:\s*/, '');
+            contentP.innerHTML = `<textarea class='edit-answer-textarea' style='width:100%;height:60px;'>${oldContent}</textarea>
+              <button class='save-edit-answer-btn'>Save</button>
+              <button class='cancel-edit-answer-btn'>Cancel</button>`;
+
+            const saveBtn = contentP.querySelector('.save-edit-answer-btn');
+            const cancelBtn = contentP.querySelector('.cancel-edit-answer-btn');
+
+            if (saveBtn) {
+              saveBtn.onclick = function() {
+                const newContent = contentP.querySelector('.edit-answer-textarea').value;
+                fetch('../php/edit-answer.php', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                  body: `id=${answerId}&content=${encodeURIComponent(newContent)}`
+                })
+                .then(res => res.json())
+                .then(data => {
+                  if (data.success) {
+                    contentP.innerHTML = `<strong>${answer.user}:</strong> ${newContent}`;
+                  } else {
+                    alert('Error: ' + (data.error || 'Failed to edit answer'));
+                  }
+                });
+              };
+            }
+            if (cancelBtn) {
+              cancelBtn.onclick = function() {
+                contentP.innerHTML = `<strong>${answer.user}:</strong> ${oldContent}`;
+              };
+            }
+          };
+        });
+        container.querySelectorAll('.delete-answer-btn').forEach(btn => {
+          btn.onclick = function() {
+            if (!confirm('Are you sure you want to delete this answer?')) return;
+            const answerId = btn.getAttribute('data-answer-id');
+            fetch('../php/delete-answer.php', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+              body: `id=${answerId}`
+            })
+            .then(res => res.json())
+            .then(data => {
+              if (data.success) {
+                btn.closest('.answer').remove();
+              } else {
+                alert('Error: ' + (data.error || 'Failed to delete answer'));
+              }
+            });
+          };
+        });
+
+        // Attach handler for Add Comment buttons for answers
+        container.querySelectorAll('.open-comment-modal').forEach(btn => {
+          btn.onclick = function() {
+            const answerId = btn.getAttribute('data-answer-id');
+            document.getElementById('commentQuestionId').value = '';
+            document.getElementById('commentAnswerId').value = answerId;
+            document.getElementById('commentModal').style.display = 'flex';
+          };
+        });
+
+        // Attach handler for the main Comment on Question button
+        const commentBtn = document.getElementById('commentBtn');
+        if (commentBtn) {
+          commentBtn.onclick = function() {
+            const questionId = new URLSearchParams(window.location.search).get('id');
+            document.getElementById('commentQuestionId').value = questionId;
+            document.getElementById('commentAnswerId').value = '';
+            document.getElementById('commentModal').style.display = 'flex';
+          };
         }
       })
       .catch(error => {

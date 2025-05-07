@@ -74,6 +74,7 @@ try {
             $ratingStmt->close();
 
             $answer['comments'] = $comments;
+            $answer['is_owner'] = (isset($_SESSION['user_id']) && $_SESSION['user_id'] == $answer['user_id']);
             $answers[] = $answer;
         }
         $stmt->close();
