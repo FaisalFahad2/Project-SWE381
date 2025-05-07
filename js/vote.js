@@ -1,32 +1,12 @@
 document.addEventListener('DOMContentLoaded', function() {
-  const answersContainer = document.getElementById('answersContainer');
-  const questionIdInput = document.getElementById('questionId');
-
-  const urlParams = new URLSearchParams(window.location.search);
-  const questionId = urlParams.get('id');
-
-  if (!questionId) {
-      console.error('No question ID found in URL.');
-      answersContainer.innerHTML = "<p>No question selected.</p>";
-      return;
-  }
-
-  questionIdInput.value = questionId;
-  fetch(`../php/question.php?question_id=${questionId}`)
-      .then(response => response.text())
-      .then(data => {
-          answersContainer.innerHTML = data;
-          attachVoteHandlers(); // 🔥 أضف هذا بعد تحميل الإجابات
-      })
-      .catch(error => {
-          console.error('Error fetching answers:', error);
-      });
+  // Only attach vote handlers; do not load answers here
+  attachVoteHandlers();
 });
 
 // دالة جديدة لربط أزرار التصويت
 function attachVoteHandlers() {
-  const upvoteButtons = document.querySelectorAll('.up');
-  const downvoteButtons = document.querySelectorAll('.down');
+  const upvoteButtons = document.querySelectorAll('.upvote');
+  const downvoteButtons = document.querySelectorAll('.downvote');
 
   upvoteButtons.forEach(button => {
       button.addEventListener('click', function() {
