@@ -1,4 +1,16 @@
-document.addEventListener('DOMContentLoaded', function() {
+/* ../js/questions.js */
+
+/*
+ *  Set this constant to the folder that sits directly under http://localhost/
+ *  In your case (see the Network tab: "…/Project-SWE381/html%20files/…")
+ *  that folder is "Project-SWE381".
+ */
+// const PROJECT_ROOT = '/Project-SWE381';   //  ← change if your project folder is named differently
+// const API_ROOT     = `${PROJECT_ROOT}/php/`;   // → resolves to /Project-SWE381/php/...
+
+/* ───────────────────────────────────────────────────────── */
+
+document.addEventListener('DOMContentLoaded', async function() {
   // Load questions on page load
   loadQuestions();
 
@@ -8,28 +20,50 @@ document.addEventListener('DOMContentLoaded', function() {
   const closeModal = document.getElementById("closeModal");
   const questionForm = document.getElementById("questionForm");
 
+  // Check if user is logged in using the session endpoint
+  let isLoggedIn = false;
+  try {
+    const response = await fetch('/Project-SWE381/php/check_session.php');
+    const data = await response.json();
+    isLoggedIn = data.logged_in;
+    if (isLoggedIn) {
+      sessionStorage.setItem('user_id', data.user_id);
+      sessionStorage.setItem('username', data.username);
+    }
+  } catch (err) {
+    console.error('Error checking session:', err);
+  }
+  
+  // Show/hide Add Question button based on login status
+  if (addBtn) {
+    if (!isLoggedIn) {
+      addBtn.style.display = 'none';
+    } else {
+      addBtn.style.display = 'block';
+    }
+  }
+
   // Open modal on "Add Question" button click
-  addBtn.addEventListener('click', function() {
-    document.getElementById("modalTitle").textContent = "Add Question";
-    questionForm.reset();
-    document.getElementById("questionId").value = "";
-
-    // Disable page scroll
-    document.body.style.overflow = "hidden";
-
-    // Show the modal
-    modal.style.display = "flex";  // Use "flex" so align-items & justify-content center
-  });
+  if (addBtn) {
+    addBtn.addEventListener('click', function() {
+      if (!isLoggedIn) {
+        window.location.href = 'login.html';
+        return;
+      }
+      document.getElementById("modalTitle").textContent = "Add Question";
+      questionForm.reset();
+      document.getElementById("questionId").value = "";
+      document.body.style.overflow = "hidden";
+      modal.style.display = "flex";
+    });
+  }
 
   // Close modal when clicking the close icon
   closeModal.addEventListener('click', function() {
     modal.style.display = "none";
-
-    // Re-enable scrolling
     document.body.style.overflow = "auto";
   });
 
-  // Close modal if clicking outside the modal content
   window.addEventListener('click', function(event) {
     if (event.target === modal) {
       modal.style.display = "none";
@@ -38,112 +72,216 @@ document.addEventListener('DOMContentLoaded', function() {
   });
 
   // Handle form submission (for add/edit)
-  questionForm.addEventListener('submit', function(e) {
+  questionForm.addEventListener('submit', async function(e) {
     e.preventDefault();
-    let questionId = document.getElementById("questionId").value;
+  
+    // Disable the submit button to prevent double submission
+    const submitBtn = questionForm.querySelector('button[type="submit"]');
+    if (submitBtn) submitBtn.disabled = true;
+  
+    let id = document.getElementById("questionId").value;
     let title = document.getElementById("questionTitle").value;
     let description = document.getElementById("questionDescription").value;
-    let formData = new FormData();
-    formData.append('title', title);
-    formData.append('description', description);
-
-    if (questionId) { // Edit existing question
-      formData.append('id', questionId);
-      fetch('php/edit-question.php', {
-        method: 'POST',
-        body: formData
-      })
-      .then(response => response.text())
-      .then(data => {
-        console.log(data);
-        modal.style.display = "none";
-        document.body.style.overflow = "auto";
-        loadQuestions();
-      });
-    } else { // Add new question
-      fetch('php/submit-question.php', {
-        method: 'POST',
-        body: formData
-      })
-      .then(response => response.text())
-      .then(data => {
-        console.log(data);
-        modal.style.display = "none";
-        document.body.style.overflow = "auto";
-        loadQuestions();
-      });
+    
+    let fd = new FormData();
+    fd.append('title', title);
+    fd.append('description', description);
+  
+    try {
+      /* ----- add ----- */
+      if (!id) {
+        const response = await fetch(`/Project-SWE381/php/submit-question.php`, { 
+          method: 'POST', 
+          body: fd 
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+          modal.style.display = 'none';
+          document.body.style.overflow = 'auto';
+          await loadQuestions();
+        } else {
+          alert(data.message || 'Could not add question.');
+        }
+      } else {
+        /* ----- edit ----- */
+        fd.append('id', id);
+        const response = await fetch(`/Project-SWE381/php/edit-question.php`, { 
+          method: 'POST', 
+          body: fd 
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+          modal.style.display = 'none';
+          document.body.style.overflow = 'auto';
+          await loadQuestions();
+        } else {
+          alert(data.message || 'Could not edit question.');
+        }
+      }
+    } catch (err) {
+      console.error(err);
+      alert('Network / server error – check console.');
+    } finally {
+      if (submitBtn) submitBtn.disabled = false; // Re-enable button
     }
   });
 
-  // Search functionality
-  document.getElementById("searchBtn").addEventListener('click', function() {
-    let searchTerm = document.getElementById("searchInput").value;
-    loadQuestions(searchTerm);
+  /* search */
+  document.getElementById('searchBtn').addEventListener('click', () => {
+    const term = document.getElementById('searchInput').value;
+    loadQuestions(term);
   });
 });
 
-// Function to load questions via AJAX
-function loadQuestions(searchTerm = '') {
-  let url = 'php/get-question.php';
-  if (searchTerm) {
-    url += '?search=' + encodeURIComponent(searchTerm);
-  }
-  fetch(url)
-    .then(response => response.json())
-    .then(data => {
-      const questionList = document.getElementById("questionList");
-      questionList.innerHTML = '';
-      data.forEach(function(question) {
-        let li = document.createElement("li");
-        li.innerHTML = `
-          <h3>${question.title}</h3>
-          <p>${question.description}</p>
-          <button onclick="editQuestion(${question.id})">Edit</button>
-          <button onclick="deleteQuestion(${question.id})">Delete</button>
+/* ------------ helpers ------------ */
+async function loadQuestions(term = '') {
+  let url = `/Project-SWE381/php/get-question.php`;
+  if (term) url += `?search=${encodeURIComponent(term)}`;
+
+  try {
+    const response = await fetch(url);
+    console.log('Response status:', response.status);
+    console.log('Response headers:', Object.fromEntries(response.headers.entries()));
+    const text = await response.text();
+    console.log('Raw response:', text);
+    console.log('Response type:', typeof text);
+    console.log('Response length:', text.length);
+    
+    // Try to find where the invalid content starts
+    const jsonStart = text.indexOf('{');
+    const jsonStart2 = text.indexOf('[');
+    if (jsonStart !== -1 || jsonStart2 !== -1) {
+      const start = Math.min(jsonStart === -1 ? Infinity : jsonStart, jsonStart2 === -1 ? Infinity : jsonStart2);
+      console.log('JSON starts at position:', start);
+      if (start > 0) {
+        console.log('Content before JSON:', text.substring(0, start));
+      }
+    }
+    
+    const data = JSON.parse(text);
+    const list = document.getElementById('questionList');
+    list.innerHTML = '';
+    
+    const currentUserId = sessionStorage.getItem('user_id');
+    
+    data.forEach(q => {
+      const li = document.createElement('li');
+      const isOwner = currentUserId && q.user_id == currentUserId;
+      
+      let actionButtons = '';
+      if (isOwner) {
+        actionButtons = `
+          <button onclick="editQuestion(${q.id})">Edit</button>
+          <button onclick="deleteQuestion(${q.id})">Delete</button>
         `;
-        questionList.appendChild(li);
-      });
-    })
-    .catch(error => console.error('Error loading questions:', error));
-}
-
-// Open modal to edit a question
-function editQuestion(id) {
-  let formData = new FormData();
-  formData.append('id', id);
-  fetch('php/get-question.php', {
-    method: 'POST',
-    body: formData
-  })
-  .then(response => response.json())
-  .then(question => {
-    document.getElementById("modalTitle").textContent = "Edit Question";
-    document.getElementById("questionId").value = question.id;
-    document.getElementById("questionTitle").value = question.title;
-    document.getElementById("questionDescription").value = question.description;
-
-    // Disable page scroll
-    document.body.style.overflow = "hidden";
-
-    // Show the modal
-    let modal = document.getElementById("questionModal");
-    modal.style.display = "flex";
-  });
-}
-
-// Delete a question
-function deleteQuestion(id) {
-  if (confirm("Are you sure you want to delete this question?")) {
-    let formData = new FormData();
-    formData.append('id', id);
-    fetch('php/delete-question.php', {
-      method: 'POST',
-      body: formData
-    })
-    .then(response => response.text())
-    .then(data => {
-      console.log(data);
-      loadQuestions();
+      }
+      
+      li.innerHTML = `
+        <h3><a href="question.html?id=${q.id}">${q.title}</a></h3>
+        <p>${q.description}</p>
+        ${actionButtons}
+      `;
+      list.appendChild(li);
     });
+  } catch (err) {
+    console.error('Error loading questions:', err);
+    const list = document.getElementById('questionList');
+    list.innerHTML = '<li>Error loading questions. Check console for details.</li>';
+  }
+}
+
+async function editQuestion(id) {
+  if (!sessionStorage.getItem('user_id')) {
+    window.location.href = 'login.html';
+    return;
+  }
+
+  try {
+    const fd = new FormData();
+    fd.append('id', id);
+
+    const response = await fetch(`/Project-SWE381/php/get-question.php`, { 
+      method: 'POST', 
+      body: fd 
+    });
+    
+    console.log('Edit response status:', response.status);
+    console.log('Edit response headers:', Object.fromEntries(response.headers.entries()));
+    const text = await response.text();
+    console.log('Edit raw response:', text);
+    
+    // Try to find where the invalid content starts
+    const jsonStart = text.indexOf('{');
+    if (jsonStart !== -1) {
+      console.log('JSON starts at position:', jsonStart);
+      if (jsonStart > 0) {
+        console.log('Content before JSON:', text.substring(0, jsonStart));
+      }
+    }
+    
+    const q = JSON.parse(text);
+    
+    // Check if the current user owns this question
+    if (q.user_id != sessionStorage.getItem('user_id')) {
+      alert('You can only edit your own questions.');
+      return;
+    }
+    
+    document.getElementById('modalTitle').textContent = 'Edit Question';
+    document.getElementById('questionId').value = q.id;
+    document.getElementById('questionTitle').value = q.title;
+    document.getElementById('questionDescription').value = q.description;
+    document.body.style.overflow = 'hidden';
+    document.getElementById('questionModal').style.display = 'flex';
+  } catch (err) {
+    console.error('Error loading question:', err);
+    alert('Error loading question details. Check console for details.');
+  }
+}
+
+async function deleteQuestion(id) {
+  if (!sessionStorage.getItem('user_id')) {
+    window.location.href = 'login.html';
+    return;
+  }
+
+  if (!confirm('Delete this question?')) return;
+
+  try {
+    const fd = new FormData();
+    fd.append('id', id);
+
+    const response = await fetch(`/Project-SWE381/php/delete-question.php`, { 
+      method: 'POST', 
+      body: fd 
+    });
+    
+    console.log('Delete response status:', response.status);
+    console.log('Delete response headers:', Object.fromEntries(response.headers.entries()));
+    const text = await response.text();
+    console.log('Delete raw response:', text);
+    
+    // Try to find where the invalid content starts
+    const jsonStart = text.indexOf('{');
+    if (jsonStart !== -1) {
+      console.log('JSON starts at position:', jsonStart);
+      if (jsonStart > 0) {
+        console.log('Content before JSON:', text.substring(0, jsonStart));
+      }
+    }
+    
+    const result = JSON.parse(text);
+    if (result.success) {
+      await loadQuestions();
+    } else {
+      alert(result.message || 'Error deleting question');
+    }
+  } catch (err) {
+    console.error('Error deleting question:', err);
+    alert('Error deleting question. Check console for details.');
   }
 }

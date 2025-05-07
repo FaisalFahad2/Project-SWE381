@@ -10,22 +10,34 @@
   <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@200..1000&family=Heebo:wght@100..900&family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap" rel="stylesheet">
 </head>
 <body>
-
+  <script>
+    window.onload = function() {
+      fetch('../php/check_session.php')
+        .then(response => response.json())
+        .then(data => {
+          const userLink = document.getElementById('userLink');
+    
+          if (!data.logged_in) {
+            // Not logged in: if on index, redirect to login
+            if (window.location.pathname.indexOf('index.html') !== -1) {
+              window.location.href = 'login.html';
+            }
+          } else {
+            // Logged in: change the Login link to Profile link
+            if (userLink) {
+              userLink.href = '../php/profile.php'; // Redirect to profile page
+              userLink.textContent = 'Profile';     // Change link text to "Profile"
+            }
+          }
+        })
+        .catch(error => {
+          console.error('Error checking session:', error);
+        });
+    };
+    </script>
   <header>
     <h1>StackClone</h1>
-
-    <a href="index.html">
-      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-house" viewBox="0 0 16 16">
-        <path d="M8.707 1.5a1 1 0 0 0-1.414 0L.646 8.146a.5.5 0 0 0 .708.708L2 8.207V13.5A1.5 1.5 0 0 0 3.5 15h9a1.5 1.5 0 0 0 1.5-1.5V8.207l.646.647a.5.5 0 0 0 .708-.708L13 5.793V2.5a.5.5 0 0 0-.5-.5h-1a.5.5 0 0 0-.5.5v1.293zM13 7.207V13.5a.5.5 0 0 1-.5.5h-9a.5.5 0 0 1-.5-.5V7.207l5-5z"/>
-      </svg>
-    </a>
-
-    <!--<a href="my-answers.html">
-      my answers
-    </a>
-    add by js
-  -->
-
+  
     <div class="search-container">
       <input type="text" id="searchInput" placeholder="Search questions..." />
       <button id="searchBtn" onclick="location.href='search-results.html'">
@@ -35,7 +47,14 @@
       </button>
     </div>
     
-    <a href="login.html">Login</a>
+    <a href="index.html">
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-house" viewBox="0 0 16 16">
+        <path d="M8.707 1.5a1 1 0 0 0-1.414 0L.646 8.146a.5.5 0 0 0 .708.708L2 8.207V13.5A1.5 1.5 0 0 0 3.5 15h9a1.5 1.5 0 0 0 1.5-1.5V8.207l.646.647a.5.5 0 0 0 .708-.708L13 5.793V2.5a.5.5 0 0 0-.5-.5h-1a.5.5 0 0 0-.5.5v1.293zM13 7.207V13.5a.5.5 0 0 1-.5.5h-9a.5.5 0 0 1-.5-.5V7.207l5-5z"/>
+      </svg>
+    </a>
+
+    <a href="../php/profile.php">Profile</a>
+
   </header>
 
 

@@ -2,8 +2,13 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Register</title>
+  <title>Login</title>
   <link rel="stylesheet" href="../css/style.css">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@200..1000&family=Heebo:wght@100..900&family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap" rel="stylesheet">
+
 </head>
 
 <body>
@@ -18,40 +23,29 @@
     
         
       </header>
-    <main>
-        
-        <h2 style="text-align: center;">Register</h2>
-        <form action="#" method="POST" class="register-form">
-            <label for="firstname">First Name</label>
-            <input type="text" id="firstname" name="firstname" required placeholder="First Name">
+<main>
+  <form action="../php/login.php" method="POST" class="login-form">
+    <h2 style="text-align: center;">Login</h2>
 
-            <label for = "lastname">Last Name</label>
-            <input type="text" id = "lastname" name="lastname" required placeholder="Last Name">
+    <label for="username">Username</label>
+    <input type="text" id="username" name="username" required placeholder="Enter your username">
 
-            <label for = "username">Username</label>
-            <input type="text" id = "username" name = "username" required placeholder="Username">
+    <label for="password">Password</label>
+    <input type="password" id="password" name="password" required placeholder="Enter your password">
 
-            <label for = "email">Email</label>
-            <input type ="email" id = "email" name = "email" required placeholder="example@example.com">
 
-            <label for ="phone">Phone Number</label>
-            <input type="text" id="phone" name="phone" required placeholder="+1234567890">
+    <div style="text-align: right; margin-bottom: 20px;">
+      <a href="#" class="forgot-password-link">Forgot password?</a>
+    </div>
 
-            <label for="password">Password</label> 
-            <input type="password" 
-            id="password" 
-            name="password" 
-            required 
-            placeholder="At least 8 characters, incl. capital, number, symbol"
-            pattern="^(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$"
-            title="Password must be at least 8 characters, include an uppercase letter, a number, and a symbol.">  
+    <div style="text-align: right; margin-bottom: 20px;">
+      <a href="register.html" class="register-link">Don't have an account</a>
+    </div>
 
-            <button type ="submit">Register</button>
-            <p>Already have an account? <a href="login.html">Login</a></p>
-           </form>
-    </main>
-
-    <footer>
+    <button type="submit">Login</button>
+  </form>
+</main>
+      <footer>
         <p>&copy; 2025 StackClone</p>
         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-twitter-x" viewBox="0 0 16 16">
           <path d="M12.6.75h2.454l-5.36 6.142L16 15.25h-4.937l-3.867-5.07-4.425 5.07H.316l5.733-6.57L0 .75h5.063l3.495 4.633L12.601.75Zm-.86 13.028h1.36L4.323 2.145H2.865z"/>
@@ -62,4 +56,3 @@
         </svg>
       </footer>
 </body>
-</html>
