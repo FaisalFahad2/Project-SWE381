@@ -14,7 +14,7 @@ try {
         error_log("Processing request for question_id: " . $question_id);
 
         // Get answers with user information
-        $answersQuery = "SELECT a.id, a.content, a.user_id, u.username as user 
+        $answersQuery = "SELECT a.id, a.content, a.user_id, a.created_at, u.username as user 
                         FROM answers a 
                         JOIN users u ON a.user_id = u.id 
                         WHERE a.question_id = ? 
@@ -59,6 +59,7 @@ try {
             $commentsResult = $commentStmt->get_result();
             $comments = array();
             while ($comment = $commentsResult->fetch_assoc()) {
+                $comment['is_owner'] = (isset($_SESSION['user_id']) && $_SESSION['user_id'] == $comment['user_id']);
                 $comments[] = $comment;
             }
             $commentStmt->close();

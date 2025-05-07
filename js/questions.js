@@ -163,34 +163,35 @@ async function loadQuestions(term = '') {
     }
     
     const data = JSON.parse(text);
-    const list = document.getElementById('questionList');
-    list.innerHTML = '';
+    // Support both array and object with questions/data property
+    const questions = Array.isArray(data) ? data : (data.questions || data.data || []);
+    const container = document.getElementById('questionList');
+    container.innerHTML = '';
     
     const currentUserId = sessionStorage.getItem('user_id');
     
-    data.forEach(q => {
-      const li = document.createElement('li');
-      const isOwner = currentUserId && q.user_id == currentUserId;
-      
-      let actionButtons = '';
-      if (isOwner) {
-        actionButtons = `
-          <button onclick="editQuestion(${q.id})">Edit</button>
-          <button onclick="deleteQuestion(${q.id})">Delete</button>
-        `;
-      }
-      
-      li.innerHTML = `
+    questions.forEach(q => {
+      const questionDiv = document.createElement('li');
+      questionDiv.className = 'question-item';
+      questionDiv.innerHTML = `
         <h3><a href="question.html?id=${q.id}">${q.title}</a></h3>
-        <p>${q.description}</p>
-        ${actionButtons}
+        <div class="question-meta">
+          <span>${q.answer_count} answers</span>
+          <span>${q.comment_count} comments</span>
+          <span>Posted on ${formatDate(q.created_at)}</span>
+        </div>
+        <p class="description">${q.description}</p>
+        <div class="question-actions">
+          <button onclick="editQuestion(${q.id})" class="edit-btn">Edit</button>
+          <button onclick="deleteQuestion(${q.id})" class="delete-btn">Delete</button>
+        </div>
       `;
-      list.appendChild(li);
+      container.appendChild(questionDiv);
     });
   } catch (err) {
     console.error('Error loading questions:', err);
-    const list = document.getElementById('questionList');
-    list.innerHTML = '<li>Error loading questions. Check console for details.</li>';
+    const container = document.getElementById('questionList');
+    container.innerHTML = '<li>Error loading questions. Check console for details.</li>';
   }
 }
 
@@ -284,4 +285,12 @@ async function deleteQuestion(id) {
     console.error('Error deleting question:', err);
     alert('Error deleting question. Check console for details.');
   }
+}
+
+// Helper to format dates
+function formatDate(dateString) {
+  if (!dateString) return "Unknown date";
+  const date = new Date(dateString);
+  if (isNaN(date)) return "Unknown date";
+  return date.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
 }

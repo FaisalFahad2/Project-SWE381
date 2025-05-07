@@ -17,13 +17,6 @@
   <header>
     <h1>StackClone</h1>
 
-   
-
-    <!--<a href="my-answers.html">
-      my answers
-    </a>
-    add by js
-  -->
 
     <div class="search-container">
       <input type="text" id="searchInput" placeholder="Search questions..." />
@@ -45,37 +38,40 @@
 
   
     <main>
-    <button id="addQuestionBtn" class="add-question">Add Question</button>
-    
-    <ul id="questionList" class="question-list">
-      <!-- Questions will be loaded dynamically via AJAX -->
-    </ul>
-  </div>
+    <div class="main-header-row">
+      <h2 class="page-title">All Questions</h2>
+      <button id="addQuestionBtn" class="add-question-btn">+ Add Question</button>
+    </div>
+    <div class="questions-container">
+      <ul id="questionList" class="question-list">
+        <!-- Questions will be loaded dynamically via AJAX -->
+      </ul>
+    </div>
 
-  <!-- Add/Edit Question Modal -->
-  <div id="questionModal" class="modal">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h2 id="modalTitle">Add Question</h2>
-        <span id="closeModal" class="close">&times;</span>
-      </div>
-      <div class="modal-body">
-        <form id="questionForm">
-          <input type="hidden" id="questionId" value="">
-          <div class="form-group">
-            <label for="questionTitle">Title:</label>
-            <input type="text" id="questionTitle" name="title" required>
-          </div>
-          <div class="form-group">
-            <label for="questionDescription">Description:</label>
-            <textarea id="questionDescription" name="description" rows="4" required></textarea>
-          </div>
-          <button type="submit" id="submitQuestion">Submit</button>
-        </form>
+    <!-- Add/Edit Question Modal -->
+    <div id="questionModal" class="modal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2 id="modalTitle">Add Question</h2>
+          <span id="closeModal" class="close">&times;</span>
+        </div>
+        <div class="modal-body">
+          <form id="questionForm">
+            <input type="hidden" id="questionId" value="">
+            <div class="form-group">
+              <label for="questionTitle">Title:</label>
+              <input type="text" id="questionTitle" name="title" required>
+            </div>
+            <div class="form-group">
+              <label for="questionDescription">Description:</label>
+              <textarea id="questionDescription" name="description" rows="4" required></textarea>
+            </div>
+            <button type="submit" id="submitQuestion">Submit</button>
+          </form>
+        </div>
       </div>
     </div>
-  </div>
-</main>
+  </main>
   <footer>
     <p>&copy; 2025 StackClone</p>
     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-twitter-x" viewBox="0 0 16 16">
@@ -88,32 +84,7 @@
   </footer>
   <script src="../js/questions.js"></script>
   <script src="../js/search.js"></script>
-
-  <script>
-    document.addEventListener('DOMContentLoaded', function() {
-      console.log('Checking session status...');
-      fetch('../php/check_session.php')
-        .then(response => response.json())
-        .then(data => {
-          console.log('Session data:', data);
-          const userLink = document.getElementById('userLink');
-          console.log('User link element:', userLink);
-
-          if (data.logged_in) {
-            console.log('User is logged in, updating link to Profile');
-            if (userLink) {
-              userLink.href = '../php/profile.php';
-              userLink.textContent = 'Profile';
-            }
-          } else {
-            console.log('User is not logged in');
-          }
-        })
-        .catch(error => {
-          console.error('Error checking session:', error);
-        });
-    });
-  </script>
+  <script src="../js/main-header.js"></script>
 
 </body>
 </html>
