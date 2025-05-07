@@ -1,0 +1,45 @@
+{
+    "sqltools.connections": [
+        {
+            "mysqlOptions": {
+                "authProtocol": "default",
+                "enableSsl": "Disabled"
+            },
+            "previewLimit": 50,
+            "server": "localhost:3307",
+            "port": 3307,
+            "driver": "MySQL",
+            "name": "stackclone",
+            "database": "stackclone",
+            "username": "root"
+        },
+        {
+            "mysqlOptions": {
+                "authProtocol": "default",
+                "enableSsl": "Disabled"
+            },
+            "previewLimit": 50,
+            "server": "localhost:3307",
+            "port": 3307,
+            "driver": "MySQL",
+            "name": "stackclonee",
+            "database": "stackclone",
+            "username": "root",
+            "password": ""
+        },
+        {
+            "mysqlOptions": {
+                "authProtocol": "default",
+                "enableSsl": "Disabled"
+            },
+            "previewLimit": 50,
+            "server": "localhost",
+            "port": 3307,
+            "driver": "MySQL",
+            "name": "stackk",
+            "database": "stackclone",
+            "username": "root",
+            "password": ""
+        }
+    ]
+}

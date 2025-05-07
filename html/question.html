@@ -1,0 +1,798 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>View Question</title>
+  <link rel="stylesheet" href="../css/style.css" />
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@200..1000&family=Heebo:wght@100..900&family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap" rel="stylesheet">
+</head>
+<body>
+  <header>
+    <h1>StackClone</h1>
+
+    <a href="index.html">
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-house" viewBox="0 0 16 16">
+        <path d="M8.707 1.5a1 1 0 0 0-1.414 0L.646 8.146a.5.5 0 0 0 .708.708L2 8.207V13.5A1.5 1.5 0 0 0 3.5 15h9a1.5 1.5 0 0 0 1.5-1.5V8.207l.646.647a.5.5 0 0 0 .708-.708L13 5.793V2.5a.5.5 0 0 0-.5-.5h-1a.5.5 0 0 0-.5.5v1.293zM13 7.207V13.5a.5.5 0 0 1-.5.5h-9a.5.5 0 0 1-.5-.5V7.207l5-5z"/>
+      </svg>
+    </a>
+
+    <div class="search-container">
+      <input type="text" id="searchInput" placeholder="Search questions..." />
+      <button id="searchBtn" onclick="location.href='search-results.html'">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-search" viewBox="0 0 16 16">
+          <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001q.044.06.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1 1 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0"/>
+        </svg>
+      </button>
+    </div>
+    
+    <a id="userLink" href="login.html">Login</a>
+  </header>
+
+  <main>
+    <section class="question">
+      <h2 id="questionTitle">[Question Title]</h2>
+      <p id="questionBody">[Question description from DB]</p>
+      
+      <div id="questionActions" style="display: none;">
+        <button id="editQuestionBtn">Edit Question</button>
+        <button id="deleteQuestionBtn">Delete Question</button>
+      </div>
+      
+      <div class="question-comments">
+        <h3>Comments</h3>
+        <div id="questionComments">
+            <!-- Comments will be loaded here -->
+        </div>
+        <button id="addQuestionCommentBtn" class="btn">Add Comment</button>
+      </div>
+    </section>
+
+    <section class="answers">
+      <h3>Answers</h3>
+
+      <div id="answersContainer">
+      </div>
+
+      <button id="addAnswerBtn" style="display: none;">Add Answer</button>
+    </section>
+  </main>
+
+  <div id="answerModal" class="modal">
+    <div class="modal-content">
+      <span class="close">&times;</span>
+      <h2 id="answerModalTitle">Add Answer</h2>
+      <form id="answerForm">
+        <input type="hidden" name="question_id" id="questionId">
+        <textarea name="content" id="answerContent" rows="6" required></textarea>
+        <button type="submit">Submit</button>
+      </form>
+    </div>
+  </div>
+
+  <div id="commentModal" class="modal">
+    <div class="modal-content">
+      <span class="close">&times;</span>
+      <h2 id="commentModalTitle">Add Comment</h2>
+      <form id="commentForm">
+        <input type="hidden" name="question_id" id="commentQuestionId">
+        <input type="hidden" name="answer_id" id="commentAnswerId">
+        <textarea name="content" id="commentContent" rows="4" required></textarea>
+        <button type="submit">Submit</button>
+      </form>
+    </div>
+  </div>
+  
+  <footer>
+    <p>&copy; 2025 StackClone</p>
+    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-twitter-x" viewBox="0 0 16 16">
+      <path d="M12.6.75h2.454l-5.36 6.142L16 15.25h-4.937l-3.867-5.07-4.425 5.07H.316l5.733-6.57L0 .75h5.063l3.495 4.633L12.601.75Zm-.86 13.028h1.36L4.323 2.145H2.865z"/>
+    </svg>
+
+    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-github" viewBox="0 0 16 16">
+      <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8"/>
+    </svg>
+  </footer>
+
+  <!-- Load scripts in correct order -->
+  <script src="../js/search.js"></script>
+  <script src="../js/vote.js"></script>
+  <script src="../js/main.js"></script>
+  
+  <script>
+    // Function to check if elements exist
+    function checkElements() {
+      const elements = {
+        userLink: document.getElementById('userLink'),
+        addAnswerBtn: document.getElementById('addAnswerBtn'),
+        questionActions: document.getElementById('questionActions')
+      };
+      
+      console.log('Checking elements:', elements);
+      return elements;
+    }
+
+    // Function to handle session check
+    function checkSession() {
+      console.log('Checking session...');
+      return fetch('../php/check_session.php')
+        .then(response => {
+          console.log('Session response received:', response);
+          return response.json();
+        })
+        .then(data => {
+          console.log('Session data:', data);
+          return data;
+        })
+        .catch(error => {
+          console.error('Session check error:', error);
+          throw error;
+        });
+    }
+
+    // Function to update UI based on session
+    function updateUI(data) {
+      console.log('Updating UI with data:', data);
+      const elements = checkElements();
+      
+      if (data.logged_in) {
+        console.log('User is logged in');
+        if (elements.userLink) {
+          elements.userLink.href = '../php/profile.php';
+          elements.userLink.textContent = 'Profile';
+        }
+        if (elements.addAnswerBtn) {
+          elements.addAnswerBtn.style.display = 'block';
+          console.log('Add Answer button displayed');
+        }
+      } else {
+        console.log('User is not logged in');
+        if (elements.addAnswerBtn) elements.addAnswerBtn.style.display = 'none';
+        if (elements.questionActions) elements.questionActions.style.display = 'none';
+      }
+    }
+
+    function loadQuestionDetails(currentUserId = null) {
+      const questionId = new URLSearchParams(window.location.search).get('id');
+      if (!questionId) {
+        document.getElementById('questionTitle').textContent = "No question ID provided.";
+        return;
+      }
+
+      console.log('Loading question details for ID:', questionId);
+
+      // Load question details
+      fetch(`../php/get-question-details.php?id=${questionId}`)
+        .then(response => {
+          console.log('Question details response:', response);
+          return response.json();
+        })
+        .then(data => {
+          console.log('Question details data:', data);
+          if (data.success) {
+            document.getElementById('questionTitle').textContent = data.title;
+            document.getElementById('questionBody').textContent = data.description;
+            
+            // Show edit/delete buttons only if user owns the question
+            if (currentUserId && data.user_id == currentUserId) {
+              const questionActions = document.getElementById('questionActions');
+              if (questionActions) {
+                questionActions.style.display = 'block';
+                
+                // Add edit question handler
+                const editQuestionBtn = document.getElementById('editQuestionBtn');
+                if (editQuestionBtn) {
+                  editQuestionBtn.onclick = function() {
+                    const titleElement = document.getElementById('questionTitle');
+                    const bodyElement = document.getElementById('questionBody');
+                    const oldTitle = titleElement.textContent;
+                    const oldBody = bodyElement.textContent;
+                    
+                    titleElement.innerHTML = `
+                      <textarea class='edit-question-textarea' style='width:100%;height:40px;'>${oldTitle}</textarea>
+                    `;
+                    bodyElement.innerHTML = `
+                      <textarea class='edit-question-textarea' style='width:100%;height:100px;'>${oldBody}</textarea>
+                      <button class='save-edit-question-btn'>Save</button>
+                      <button class='cancel-edit-question-btn'>Cancel</button>
+                    `;
+
+                    const saveBtn = bodyElement.querySelector('.save-edit-question-btn');
+                    const cancelBtn = bodyElement.querySelector('.cancel-edit-question-btn');
+
+                    if (saveBtn) {
+                      saveBtn.onclick = function() {
+                        const newTitle = titleElement.querySelector('.edit-question-textarea').value;
+                        const newBody = bodyElement.querySelector('.edit-question-textarea').value;
+                        
+                        fetch('../php/edit-question.php', {
+                          method: 'POST',
+                          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                          body: `id=${questionId}&title=${encodeURIComponent(newTitle)}&content=${encodeURIComponent(newBody)}`
+                        })
+                        .then(res => res.json())
+                        .then(data => {
+                          if (data.success) {
+                            titleElement.textContent = newTitle;
+                            bodyElement.textContent = newBody;
+                          } else {
+                            alert('Error: ' + (data.error || 'Failed to edit question'));
+                          }
+                        });
+                      };
+                    }
+                    if (cancelBtn) {
+                      cancelBtn.onclick = function() {
+                        titleElement.textContent = oldTitle;
+                        bodyElement.textContent = oldBody;
+                      };
+                    }
+                  };
+                }
+
+                // Add delete question handler
+                const deleteQuestionBtn = document.getElementById('deleteQuestionBtn');
+                if (deleteQuestionBtn) {
+                  deleteQuestionBtn.onclick = function() {
+                    if (!confirm('Are you sure you want to delete this question?')) return;
+                    
+                    fetch('../php/delete-question.php', {
+                      method: 'POST',
+                      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                      body: `id=${questionId}`
+                    })
+                    .then(res => res.json())
+                    .then(data => {
+                      if (data.success) {
+                        window.location.href = 'index.html';
+                      } else {
+                        alert('Error: ' + (data.error || 'Failed to delete question'));
+                      }
+                    });
+                  };
+                }
+              }
+            }
+
+            // Load answers and comments immediately after question details
+            console.log('About to load answers for question:', questionId);
+            loadAnswers(questionId);
+          } else {
+            document.getElementById('questionTitle').textContent = "Question not found.";
+            document.getElementById('questionBody').textContent = "";
+          }
+        })
+        .catch(error => {
+          console.error('Error loading question details:', error);
+          document.getElementById('questionTitle').textContent = "Error loading question.";
+          document.getElementById('questionBody').textContent = "";
+        });
+    }
+
+    function loadAnswers(questionId) {
+      console.log('Loading answers for question:', questionId);
+      const formData = new FormData();
+      formData.append("question_id", questionId);
+
+      console.log('Sending request to get-answers-comments.php');
+      fetch("../php/get-answers-comments.php", {
+        method: "POST",
+        body: formData
+      })
+      .then(res => {
+        console.log('Raw response:', res);
+        if (!res.ok) {
+          throw new Error(`HTTP error! status: ${res.status}`);
+        }
+        return res.json();
+      })
+      .then(data => {
+        console.log('Parsed answers data:', data);
+        
+        if (!data.success) {
+          console.error('Server returned error:', data.message);
+          return;
+        }
+
+        // Handle question comments
+        const questionCommentsContainer = document.getElementById("questionComments");
+        if (questionCommentsContainer) {
+          questionCommentsContainer.innerHTML = "";
+          if (data.question_comments && data.question_comments.length > 0) {
+            console.log('Loading question comments:', data.question_comments);
+            data.question_comments.forEach(comment => {
+              const commentDiv = document.createElement("div");
+              commentDiv.className = "comment";
+              commentDiv.innerHTML = `
+                <p><em>${comment.user}: ${comment.content}</em></p>
+                ${comment.is_owner ? `
+                  <div class="comment-actions">
+                    <button class="edit-comment-btn" data-comment-id="${comment.id}">Edit</button>
+                    <button class="delete-comment-btn" data-comment-id="${comment.id}">Delete</button>
+                  </div>
+                ` : ''}
+              `;
+              questionCommentsContainer.appendChild(commentDiv);
+            });
+
+            // Add event listeners for question comment buttons
+            attachCommentButtonHandlers(questionCommentsContainer);
+          }
+        }
+
+        // Handle answers and their comments
+        const container = document.getElementById("answersContainer");
+        if (container) {
+          container.innerHTML = "";
+          if (data.answers && data.answers.length > 0) {
+            console.log('Loading answers:', data.answers);
+            data.answers.forEach(answer => {
+              const answerDiv = document.createElement("div");
+              answerDiv.className = "answer";
+              answerDiv.innerHTML = `
+                <p><strong>${answer.user}:</strong> ${answer.content}</p>
+                <div class="rating">
+                  <button class="upvote" data-answer-id="${answer.id}">▲</button>
+                  <span class="rating-value">${answer.rating}</span>
+                  <button class="downvote" data-answer-id="${answer.id}">▼</button>
+                </div>
+                <div class="comments">
+                  ${answer.comments.map(comment => `
+                    <div class="comment">
+                      <p><em>${comment.user}: ${comment.content}</em></p>
+                      ${comment.is_owner ? `
+                        <div class="comment-actions">
+                          <button class="edit-comment-btn" data-comment-id="${comment.id}">Edit</button>
+                          <button class="delete-comment-btn" data-comment-id="${comment.id}">Delete</button>
+                        </div>
+                      ` : ''}
+                    </div>
+                  `).join("")}
+                </div>
+                <button class="open-comment-modal" data-answer-id="${answer.id}">Add Comment</button>
+                ${answer.is_owner ? `
+                  <button class="edit-answer-btn" data-answer-id="${answer.id}">Edit</button>
+                  <button class="delete-answer-btn" data-answer-id="${answer.id}">Delete</button>
+                ` : ''}
+              `;
+              container.appendChild(answerDiv);
+            });
+
+            // Add event listeners for answer comment buttons
+            container.querySelectorAll('.comments').forEach(commentsContainer => {
+              attachCommentButtonHandlers(commentsContainer);
+            });
+
+            // Add event listeners for Add Comment buttons on answers
+            container.querySelectorAll('.open-comment-modal').forEach(btn => {
+              btn.addEventListener('click', function() {
+                const answerId = this.getAttribute('data-answer-id');
+                document.getElementById('commentQuestionId').value = '';
+                document.getElementById('commentAnswerId').value = answerId;
+                document.getElementById('commentModalTitle').textContent = 'Add Comment to Answer';
+                document.getElementById('commentModal').style.display = 'flex';
+              });
+            });
+
+            // Add event listeners for edit and delete answer buttons
+            container.querySelectorAll('.edit-answer-btn').forEach(btn => {
+              btn.onclick = function() {
+                const answerId = btn.getAttribute('data-answer-id');
+                const answerDiv = btn.closest('.answer');
+                const contentP = answerDiv.querySelector('p strong') ? answerDiv.querySelector('p strong').parentNode : answerDiv.querySelector('p');
+                const oldContent = contentP.textContent.replace(/^.*?:\s*/, '');
+                const username = contentP.textContent.split(':')[0];
+                
+                contentP.innerHTML = `
+                  <textarea class='edit-answer-textarea' style='width:100%;height:60px;'>${oldContent}</textarea>
+                  <button class='save-edit-answer-btn'>Save</button>
+                  <button class='cancel-edit-answer-btn'>Cancel</button>
+                `;
+
+                const saveBtn = contentP.querySelector('.save-edit-answer-btn');
+                const cancelBtn = contentP.querySelector('.cancel-edit-answer-btn');
+
+                if (saveBtn) {
+                  saveBtn.onclick = function() {
+                    const newContent = contentP.querySelector('.edit-answer-textarea').value;
+                    fetch('../php/edit-answer.php', {
+                      method: 'POST',
+                      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                      body: `id=${answerId}&content=${encodeURIComponent(newContent)}`
+                    })
+                    .then(res => res.json())
+                    .then(data => {
+                      if (data.success) {
+                        contentP.innerHTML = `<strong>${username}:</strong> ${newContent}`;
+                      } else {
+                        alert('Error: ' + (data.error || 'Failed to edit answer'));
+                      }
+                    });
+                  };
+                }
+                if (cancelBtn) {
+                  cancelBtn.onclick = function() {
+                    contentP.innerHTML = `<strong>${username}:</strong> ${oldContent}`;
+                  };
+                }
+              };
+            });
+
+            container.querySelectorAll('.delete-answer-btn').forEach(btn => {
+              btn.onclick = function() {
+                if (!confirm('Are you sure you want to delete this answer?')) return;
+                const answerId = btn.getAttribute('data-answer-id');
+                fetch('../php/delete-answer.php', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                  body: `id=${answerId}`
+                })
+                .then(res => res.json())
+                .then(data => {
+                  if (data.success) {
+                    btn.closest('.answer').remove();
+                  } else {
+                    alert('Error: ' + (data.error || 'Failed to delete answer'));
+                  }
+                });
+              };
+            });
+
+            if (typeof attachVoteHandlers === 'function') {
+              attachVoteHandlers();
+            }
+          } else {
+            container.innerHTML = "<p>No answers yet. Be the first to answer!</p>";
+          }
+        }
+      })
+      .catch(error => {
+        console.error('Error loading answers:', error);
+      });
+    }
+
+    // Function to attach handlers for comment edit/delete buttons
+    function attachCommentButtonHandlers(container) {
+      container.querySelectorAll('.edit-comment-btn').forEach(btn => {
+        btn.onclick = function() {
+          const commentId = btn.getAttribute('data-comment-id');
+          const commentDiv = btn.closest('.comment');
+          const contentP = commentDiv.querySelector('p em');
+          const oldContent = contentP.textContent.replace(/^.*?:\s*/, '');
+          const username = contentP.textContent.split(':')[0];
+          
+          contentP.innerHTML = `
+            <textarea class='edit-comment-textarea' style='width:100%;height:60px;'>${oldContent}</textarea>
+            <button class='save-edit-comment-btn'>Save</button>
+            <button class='cancel-edit-comment-btn'>Cancel</button>
+          `;
+
+          const saveBtn = contentP.querySelector('.save-edit-comment-btn');
+          const cancelBtn = contentP.querySelector('.cancel-edit-comment-btn');
+
+          if (saveBtn) {
+            saveBtn.onclick = function() {
+              const newContent = contentP.querySelector('.edit-comment-textarea').value;
+              fetch('../php/edit-comment.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: `id=${commentId}&content=${encodeURIComponent(newContent)}`
+              })
+              .then(res => res.json())
+              .then(data => {
+                if (data.success) {
+                  contentP.innerHTML = `${username}: ${newContent}`;
+                } else {
+                  alert('Error: ' + (data.error || 'Failed to edit comment'));
+                }
+              });
+            };
+          }
+          if (cancelBtn) {
+            cancelBtn.onclick = function() {
+              contentP.innerHTML = `${username}: ${oldContent}`;
+            };
+          }
+        };
+      });
+
+      container.querySelectorAll('.delete-comment-btn').forEach(btn => {
+        btn.onclick = function() {
+          if (!confirm('Are you sure you want to delete this comment?')) return;
+          const commentId = btn.getAttribute('data-comment-id');
+          fetch('../php/delete-comment.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: `id=${commentId}`
+          })
+          .then(res => res.json())
+          .then(data => {
+            if (data.success) {
+              btn.closest('.comment').remove();
+            } else {
+              alert('Error: ' + (data.error || 'Failed to delete comment'));
+            }
+          });
+        };
+      });
+    }
+
+    // Initialize when DOM is loaded
+    document.addEventListener('DOMContentLoaded', function() {
+      console.log('DOM loaded, initializing...');
+      const questionId = new URLSearchParams(window.location.search).get('id');
+      
+      // Set question ID in both forms
+      document.getElementById('questionId').value = questionId;
+      document.getElementById('commentQuestionId').value = questionId;
+
+      // Handle Add Comment button for questions
+      const addQuestionCommentBtn = document.getElementById('addQuestionCommentBtn');
+      if (addQuestionCommentBtn) {
+        addQuestionCommentBtn.addEventListener('click', function() {
+          document.getElementById('commentQuestionId').value = questionId;
+          document.getElementById('commentAnswerId').value = '';
+          document.getElementById('commentModalTitle').textContent = 'Add Comment to Question';
+          document.getElementById('commentModal').style.display = 'flex';
+        });
+      }
+
+      // Handle answer form submission
+      document.getElementById('answerForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        const formData = new FormData(this);
+        
+        fetch('../php/submit-answer.php', {
+          method: 'POST',
+          body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+          if (data.success) {
+            document.getElementById('answerModal').style.display = 'none';
+            document.getElementById('answerContent').value = '';
+            loadAnswers(questionId); // Reload answers
+          } else {
+            alert('Error: ' + (data.error || 'Failed to submit answer'));
+          }
+        })
+        .catch(error => {
+          console.error('Error:', error);
+          alert('Error submitting answer');
+        });
+      });
+
+      // Handle comment form submission
+      document.getElementById('commentForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        const formData = new FormData(this);
+        
+        fetch('../php/submit-comment.php', {
+          method: 'POST',
+          body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+          if (data.success) {
+            document.getElementById('commentModal').style.display = 'none';
+            document.getElementById('commentContent').value = '';
+            loadAnswers(questionId); // Reload answers to show new comment
+          } else {
+            alert('Error: ' + (data.error || 'Failed to add comment'));
+          }
+        })
+        .catch(error => {
+          console.error('Error:', error);
+          alert('Error adding comment');
+        });
+      });
+
+      // Close modals when clicking the close button
+      document.querySelectorAll('.close').forEach(button => {
+        button.addEventListener('click', function() {
+          this.closest('.modal').style.display = 'none';
+        });
+      });
+
+      // Add click handler for Add Answer button
+      const addAnswerBtn = document.getElementById('addAnswerBtn');
+      if (addAnswerBtn) {
+        addAnswerBtn.addEventListener('click', function() {
+          document.getElementById('answerModalTitle').textContent = 'Add Answer';
+          document.getElementById('answerModal').style.display = 'flex';
+        });
+      }
+
+      // Check session and load content
+      checkSession()
+        .then(data => {
+          console.log('Session check completed, updating UI...');
+          updateUI(data);
+          // Load question details regardless of login status
+          console.log('Loading question details for ID:', questionId);
+          loadQuestionDetails(data.user_id);
+        })
+        .catch(error => {
+          console.error('Error during initialization:', error);
+          // Still try to load question details even if session check fails
+          console.log('Loading question details for ID:', questionId);
+          loadQuestionDetails();
+        });
+    });
+
+    // Function to handle voting
+    function vote(answerId, type, button) {
+      // Create XMLHttpRequest object
+      const xhr = new XMLHttpRequest();
+      
+      // Configure the request
+      xhr.open('POST', '../php/vote.php', true);
+      xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+      
+      // Set up the handler for when the request completes
+      xhr.onload = function() {
+        if (xhr.status === 200) {
+          try {
+            const data = JSON.parse(xhr.responseText);
+            console.log('Vote response:', data); // Debug log
+            
+            // Update the rating value in the DOM immediately regardless of success/failure
+            const ratingSpan = button.closest('.rating').querySelector('.rating-value');
+            if (ratingSpan) {
+              // Use the new_rating if available, otherwise use rating
+              const newRating = data.new_rating !== undefined ? data.new_rating : data.rating;
+              console.log('Updating rating to:', newRating); // Debug log
+              ratingSpan.textContent = newRating;
+
+              // Update button states based on user's vote
+              const upvoteBtn = button.closest('.rating').querySelector('.upvote');
+              const downvoteBtn = button.closest('.rating').querySelector('.downvote');
+              
+              if (data.user_vote === 'up') {
+                upvoteBtn.classList.add('voted');
+                downvoteBtn.classList.remove('voted');
+                downvoteBtn.disabled = true;
+              } else if (data.user_vote === 'down') {
+                downvoteBtn.classList.add('voted');
+                upvoteBtn.classList.remove('voted');
+                upvoteBtn.disabled = true;
+              } else {
+                upvoteBtn.classList.remove('voted');
+                downvoteBtn.classList.remove('voted');
+                upvoteBtn.disabled = false;
+                downvoteBtn.disabled = false;
+              }
+            }
+          } catch (e) {
+            console.error('Error parsing response:', e);
+            console.error('Raw response:', xhr.responseText); // Debug log
+          }
+        } else {
+          console.error('Request failed:', xhr.status);
+          console.error('Response:', xhr.responseText); // Debug log
+        }
+      };
+      
+      // Handle network errors silently
+      xhr.onerror = function() {
+        console.error('Network error occurred');
+      };
+      
+      // Send the request
+      const formData = `answer_id=${answerId}&vote_type=${type}`;
+      console.log('Sending vote request:', formData); // Debug log
+      xhr.send(formData);
+    }
+
+    // Function to attach vote handlers
+    function attachVoteHandlers() {
+      document.querySelectorAll('.upvote').forEach(btn => {
+        btn.onclick = function() {
+          const answerId = this.getAttribute('data-answer-id');
+          console.log('Upvote clicked for answer:', answerId); // Debug log
+          vote(answerId, 'up', this);
+        };
+      });
+
+      document.querySelectorAll('.downvote').forEach(btn => {
+        btn.onclick = function() {
+          const answerId = this.getAttribute('data-answer-id');
+          console.log('Downvote clicked for answer:', answerId); // Debug log
+          vote(answerId, 'down', this);
+        };
+      });
+    }
+
+    // Update the CSS styles
+    const style = document.createElement('style');
+    style.textContent = `
+      .rating {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin: 10px 0;
+      }
+      .upvote, .downvote {
+        cursor: pointer;
+        padding: 0 5px;
+        border: none;
+        background: transparent;
+        transition: all 0.2s;
+        font-size: 20px;
+        line-height: 1;
+        color: #666;
+      }
+      .upvote:hover:not(:disabled) {
+        color: #00a600;
+      }
+      .downvote:hover:not(:disabled) {
+        color: #a60000;
+      }
+      .upvote.voted {
+        color: #00a600;
+      }
+      .downvote.voted {
+        color: #a60000;
+      }
+      .upvote:disabled, .downvote:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
+      .rating-value {
+        min-width: 20px;
+        text-align: center;
+        font-weight: bold;
+        font-size: 16px;
+      }
+    `;
+    document.head.appendChild(style);
+
+    // Add this function to load question comments
+    function loadQuestionComments(questionId) {
+        fetch(`../php/get-question-comments.php?question_id=${questionId}`)
+            .then(response => response.json())
+            .then(data => {
+                const container = document.getElementById('questionComments');
+                container.innerHTML = '';
+
+                if (data.length === 0) {
+                    container.innerHTML = '<p>No comments yet.</p>';
+                    return;
+                }
+
+                data.forEach(comment => {
+                    const commentDiv = document.createElement('div');
+                    commentDiv.className = 'comment';
+                    commentDiv.id = `question-comment-${comment.id}`;
+                    commentDiv.innerHTML = `
+                        <p>${comment.content}</p>
+                        <small>- ${comment.username}</small>
+                        ${comment.is_owner ? `
+                            <div class="comment-actions">
+                                <button onclick="editQuestionComment(${comment.id}, '${comment.content}', '${comment.username}')" class="edit-btn">Edit</button>
+                                <button onclick="deleteQuestionComment(${comment.id})" class="delete-btn">Delete</button>
+                            </div>
+                        ` : ''}
+                    `;
+                    container.appendChild(commentDiv);
+                });
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                document.getElementById('questionComments').innerHTML = 
+                    '<p>Error loading comments. Please try again later.</p>';
+            });
+    }
+
+    // Call this function when the page loads
+    document.addEventListener('DOMContentLoaded', function() {
+        const questionId = new URLSearchParams(window.location.search).get('id');
+        if (questionId) {
+            loadQuestionComments(questionId);
+        }
+    });
+  </script>
+</body>
+</html>
