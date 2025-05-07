@@ -16,13 +16,13 @@ class Database {
         // Check connection
         if ($this->connection->connect_error) {
             error_log("Database connection failed: " . $this->connection->connect_error);
-            die("Database connection failed. Please try again later.");
+            throw new Exception("Database connection failed");
         }
 
         // Select database and check if successful
         if (!$this->connection->select_db($dbname)) {
             error_log("Database selection failed: " . $this->connection->error);
-            die("Database selection failed. Please try again later.");
+            throw new Exception("Database selection failed");
         }
         
         // Set charset to UTF-8

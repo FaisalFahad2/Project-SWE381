@@ -1,43 +1,50 @@
 <?php
 // get-question.php
-include 'db.php';
+error_reporting(0); // Disable error reporting
 header('Content-Type: application/json');
 
-$db = Database::getInstance();
-$conn = $db->getConnection();
+try {
+    include 'db.php';
+    $db = Database::getInstance();
+    $conn = $db->getConnection();
 
-// If a POST request with an 'id' is sent, return a single question
-if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['id'])) {
-    $id = $_POST['id'];
-    $stmt = $conn->prepare("SELECT id, user_id, title, description FROM questions WHERE id = ?");
-    $stmt->bind_param("i", $id);
+    // If a POST request with an 'id' is sent, return a single question
+    if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['id'])) {
+        $id = $_POST['id'];
+        $stmt = $conn->prepare("SELECT id, user_id, title, description FROM questions WHERE id = ?");
+        $stmt->bind_param("i", $id);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        $question = $result->fetch_assoc();
+        echo json_encode($question);
+        $stmt->close();
+        exit;
+    }
+
+    // Otherwise, fetch all questions (optionally filtered by a search term)
+    $search = '';
+    if (isset($_GET['search'])) {
+        $search = $_GET['search'];
+    }
+
+    if ($search) {
+        $searchTerm = "%" . $conn->real_escape_string($search) . "%";
+        $stmt = $conn->prepare("SELECT id, user_id, title, description FROM questions WHERE title LIKE ?");
+        $stmt->bind_param("s", $searchTerm);
+    } else {
+        $stmt = $conn->prepare("SELECT id, user_id, title, description FROM questions ORDER BY created_at DESC");
+    }
+
     $stmt->execute();
     $result = $stmt->get_result();
-    $question = $result->fetch_assoc();
-    echo json_encode($question);
+    $questions = array();
+    while ($row = $result->fetch_assoc()) {
+        $questions[] = $row;
+    }
+    echo json_encode($questions);
     $stmt->close();
-    exit;
+} catch (Exception $e) {
+    error_log("Error in get-question.php: " . $e->getMessage());
+    echo json_encode(['error' => 'Database error occurred']);
 }
-
-// Otherwise, fetch all questions (optionally filtered by a search term)
-$search = '';
-if (isset($_GET['search'])) {
-    $search = $_GET['search'];
-}
-
-if ($search) {
-    $searchTerm = "%" . $conn->real_escape_string($search) . "%";
-    $stmt = $conn->prepare("SELECT id, user_id, title, description FROM questions WHERE title LIKE ?");
-    $stmt->bind_param("s", $searchTerm);
-} else {
-    $stmt = $conn->prepare("SELECT id, user_id, title, description FROM questions ORDER BY created_at DESC");
-}
-
-$stmt->execute();
-$result = $stmt->get_result();
-$questions = array();
-while ($row = $result->fetch_assoc()) {
-    $questions[] = $row;
-}
-echo json_encode($questions);
-$stmt->close();
+?>

@@ -17,25 +17,67 @@
         .then(response => response.json())
         .then(data => {
           const userLink = document.getElementById('userLink');
-    
-          if (!data.logged_in) {
-            // Not logged in: if on index, redirect to login
-            if (window.location.pathname.indexOf('index.html') !== -1) {
-              window.location.href = 'login.html';
-            }
-          } else {
-            // Logged in: change the Login link to Profile link
+          const addAnswerBtn = document.getElementById('addAnswerBtn');
+          const questionActions = document.getElementById('questionActions');
+          const commentBtn = document.getElementById('commentBtn');
+          
+          if (data.logged_in) {
+            // Logged in: show action buttons and update profile link
             if (userLink) {
-              userLink.href = '../php/profile.php'; // Redirect to profile page
-              userLink.textContent = 'Profile';     // Change link text to "Profile"
+              userLink.href = '../php/profile.php';
+              userLink.textContent = 'Profile';
             }
+            if (addAnswerBtn) addAnswerBtn.style.display = 'block';
+            if (commentBtn) commentBtn.style.display = 'block';
+            
+            // Load question details and check ownership
+            loadQuestionDetails(data.user_id);
+          } else {
+            // Not logged in: hide action buttons
+            if (addAnswerBtn) addAnswerBtn.style.display = 'none';
+            if (commentBtn) commentBtn.style.display = 'none';
+            if (questionActions) questionActions.style.display = 'none';
+            
+            // Load question details without ownership check
+            loadQuestionDetails();
           }
         })
         .catch(error => {
           console.error('Error checking session:', error);
         });
     };
-    </script>
+
+    function loadQuestionDetails(currentUserId = null) {
+      const questionId = new URLSearchParams(window.location.search).get('id');
+      if (!questionId) {
+        document.getElementById('questionTitle').textContent = "No question ID provided.";
+        return;
+      }
+
+      fetch(`../php/get-question-details.php?id=${questionId}`)
+        .then(response => response.json())
+        .then(data => {
+          if (data.success) {
+            document.getElementById('questionTitle').textContent = data.title;
+            document.getElementById('questionBody').textContent = data.description;
+            
+            // Show edit/delete buttons only if user owns the question
+            if (currentUserId && data.user_id == currentUserId) {
+              const questionActions = document.getElementById('questionActions');
+              if (questionActions) questionActions.style.display = 'block';
+            }
+          } else {
+            document.getElementById('questionTitle').textContent = "Question not found.";
+            document.getElementById('questionBody').textContent = "";
+          }
+        })
+        .catch(error => {
+          console.error('Error:', error);
+          document.getElementById('questionTitle').textContent = "Error loading question.";
+          document.getElementById('questionBody').textContent = "";
+        });
+    }
+  </script>
   <header>
     <h1>StackClone</h1>
 
@@ -54,7 +96,7 @@
       </button>
     </div>
     
-    <a href="login.html">Login</a>
+    <a id="userLink" href="login.html">Login</a>
   </header>
 
   <main>
@@ -62,7 +104,11 @@
       <h2 id="questionTitle">[Question Title]</h2>
       <p id="questionBody">[Question description from DB]</p>
       
-      <button class="open-comment-modal" data-question-id="101" id="commentBtn">Comment on Question</button>
+      <div id="questionActions" style="display: none;">
+        <button class="open-comment-modal" id="commentBtn">Comment on Question</button>
+        <button id="editQuestionBtn">Edit Question</button>
+        <button id="deleteQuestionBtn">Delete Question</button>
+      </div>
       
       <div id="questionComments">
       </div>
@@ -72,20 +118,18 @@
       <h3>Answers</h3>
 
       <div id="answersContainer">
-        
       </div>
 
-      <button class="open-answer-modal" data-question-id="101" id="addAnswerBtn">Add Answer</button>
+      <button id="addAnswerBtn" style="display: none;">Add Answer</button>
     </section>
   </main>
 
   <div id="answerModal" class="modal">
     <div class="modal-content">
       <span class="close">&times;</span>
-      <h2 id="answerModalTitle">Add/Edit Answer</h2>
+      <h2 id="answerModalTitle">Add Answer</h2>
       <form id="answerForm">
         <input type="hidden" name="question_id" id="questionId">
-        <input type="hidden" name="answer_id" id="answerId">
         <textarea name="content" id="answerContent" rows="6" required></textarea>
         <button type="submit">Submit</button>
       </form>
@@ -95,11 +139,9 @@
   <div id="commentModal" class="modal">
     <div class="modal-content">
       <span class="close">&times;</span>
-      <h2 id="commentModalTitle">Add/Edit Comment</h2>
+      <h2 id="commentModalTitle">Add Comment</h2>
       <form id="commentForm">
         <input type="hidden" name="question_id" id="commentQuestionId">
-        <input type="hidden" name="answer_id" id="commentAnswerId">
-        <input type="hidden" name="comment_id" id="commentId">
         <textarea name="content" id="commentContent" rows="4" required></textarea>
         <button type="submit">Submit</button>
       </form>

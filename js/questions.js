@@ -10,7 +10,7 @@
 
 /* ───────────────────────────────────────────────────────── */
 
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', async function() {
   // Load questions on page load
   loadQuestions();
 
@@ -20,14 +20,43 @@ document.addEventListener('DOMContentLoaded', function() {
   const closeModal = document.getElementById("closeModal");
   const questionForm = document.getElementById("questionForm");
 
+  // Check if user is logged in using the session endpoint
+  let isLoggedIn = false;
+  try {
+    const response = await fetch('/Project-SWE381/php/check_session.php');
+    const data = await response.json();
+    isLoggedIn = data.logged_in;
+    if (isLoggedIn) {
+      sessionStorage.setItem('user_id', data.user_id);
+      sessionStorage.setItem('username', data.username);
+    }
+  } catch (err) {
+    console.error('Error checking session:', err);
+  }
+  
+  // Show/hide Add Question button based on login status
+  if (addBtn) {
+    if (!isLoggedIn) {
+      addBtn.style.display = 'none';
+    } else {
+      addBtn.style.display = 'block';
+    }
+  }
+
   // Open modal on "Add Question" button click
-  addBtn.addEventListener('click', function() {
-    document.getElementById("modalTitle").textContent = "Add Question";
-    questionForm.reset();
-    document.getElementById("questionId").value = "";
-    document.body.style.overflow = "hidden";
-    modal.style.display = "flex";
-  });
+  if (addBtn) {
+    addBtn.addEventListener('click', function() {
+      if (!isLoggedIn) {
+        window.location.href = 'login.html';
+        return;
+      }
+      document.getElementById("modalTitle").textContent = "Add Question";
+      questionForm.reset();
+      document.getElementById("questionId").value = "";
+      document.body.style.overflow = "hidden";
+      modal.style.display = "flex";
+    });
+  }
 
   // Close modal when clicking the close icon
   closeModal.addEventListener('click', function() {
@@ -115,20 +144,46 @@ async function loadQuestions(term = '') {
 
   try {
     const response = await fetch(url);
+    console.log('Response status:', response.status);
+    console.log('Response headers:', Object.fromEntries(response.headers.entries()));
     const text = await response.text();
     console.log('Raw response:', text);
+    console.log('Response type:', typeof text);
+    console.log('Response length:', text.length);
+    
+    // Try to find where the invalid content starts
+    const jsonStart = text.indexOf('{');
+    const jsonStart2 = text.indexOf('[');
+    if (jsonStart !== -1 || jsonStart2 !== -1) {
+      const start = Math.min(jsonStart === -1 ? Infinity : jsonStart, jsonStart2 === -1 ? Infinity : jsonStart2);
+      console.log('JSON starts at position:', start);
+      if (start > 0) {
+        console.log('Content before JSON:', text.substring(0, start));
+      }
+    }
     
     const data = JSON.parse(text);
     const list = document.getElementById('questionList');
     list.innerHTML = '';
     
+    const currentUserId = sessionStorage.getItem('user_id');
+    
     data.forEach(q => {
       const li = document.createElement('li');
+      const isOwner = currentUserId && q.user_id == currentUserId;
+      
+      let actionButtons = '';
+      if (isOwner) {
+        actionButtons = `
+          <button onclick="editQuestion(${q.id})">Edit</button>
+          <button onclick="deleteQuestion(${q.id})">Delete</button>
+        `;
+      }
+      
       li.innerHTML = `
         <h3><a href="question.html?id=${q.id}">${q.title}</a></h3>
         <p>${q.description}</p>
-        <button onclick="editQuestion(${q.id})">Edit</button>
-        <button onclick="deleteQuestion(${q.id})">Delete</button>
+        ${actionButtons}
       `;
       list.appendChild(li);
     });
@@ -140,6 +195,11 @@ async function loadQuestions(term = '') {
 }
 
 async function editQuestion(id) {
+  if (!sessionStorage.getItem('user_id')) {
+    window.location.href = 'login.html';
+    return;
+  }
+
   try {
     const fd = new FormData();
     fd.append('id', id);
@@ -149,7 +209,27 @@ async function editQuestion(id) {
       body: fd 
     });
     
-    const q = await response.json();
+    console.log('Edit response status:', response.status);
+    console.log('Edit response headers:', Object.fromEntries(response.headers.entries()));
+    const text = await response.text();
+    console.log('Edit raw response:', text);
+    
+    // Try to find where the invalid content starts
+    const jsonStart = text.indexOf('{');
+    if (jsonStart !== -1) {
+      console.log('JSON starts at position:', jsonStart);
+      if (jsonStart > 0) {
+        console.log('Content before JSON:', text.substring(0, jsonStart));
+      }
+    }
+    
+    const q = JSON.parse(text);
+    
+    // Check if the current user owns this question
+    if (q.user_id != sessionStorage.getItem('user_id')) {
+      alert('You can only edit your own questions.');
+      return;
+    }
     
     document.getElementById('modalTitle').textContent = 'Edit Question';
     document.getElementById('questionId').value = q.id;
@@ -164,6 +244,11 @@ async function editQuestion(id) {
 }
 
 async function deleteQuestion(id) {
+  if (!sessionStorage.getItem('user_id')) {
+    window.location.href = 'login.html';
+    return;
+  }
+
   if (!confirm('Delete this question?')) return;
 
   try {
@@ -175,7 +260,26 @@ async function deleteQuestion(id) {
       body: fd 
     });
     
-    await loadQuestions();
+    console.log('Delete response status:', response.status);
+    console.log('Delete response headers:', Object.fromEntries(response.headers.entries()));
+    const text = await response.text();
+    console.log('Delete raw response:', text);
+    
+    // Try to find where the invalid content starts
+    const jsonStart = text.indexOf('{');
+    if (jsonStart !== -1) {
+      console.log('JSON starts at position:', jsonStart);
+      if (jsonStart > 0) {
+        console.log('Content before JSON:', text.substring(0, jsonStart));
+      }
+    }
+    
+    const result = JSON.parse(text);
+    if (result.success) {
+      await loadQuestions();
+    } else {
+      alert(result.message || 'Error deleting question');
+    }
   } catch (err) {
     console.error('Error deleting question:', err);
     alert('Error deleting question. Check console for details.');

@@ -13,34 +13,6 @@
 
 <body>
 
- <script>
-window.onload = function() {
-  fetch('../php/check_session.php')
-    .then(response => response.json())
-    .then(data => {
-      const userLink = document.getElementById('userLink');
-
-      if (!data.logged_in) {
-        // Not logged in: if on index, redirect to login
-        if (window.location.pathname.indexOf('index.html') !== -1) {
-          window.location.href = 'login.html';
-        }
-      } else {
-        // Logged in: change the Login link to Profile link
-        if (userLink) {
-          userLink.href = '../php/profile.php'; // Redirect to profile page
-          userLink.textContent = 'Profile';     // Change link text to "Profile"
-        }
-      }
-    })
-    .catch(error => {
-      console.error('Error checking session:', error);
-    });
-};
-</script>
-
-    
-    
   <!-- Shared header (could be included via server-side include) -->
   <header>
     <h1>StackClone</h1>
@@ -116,6 +88,32 @@ window.onload = function() {
   </footer>
   <script src="../js/questions.js"></script>
   <script src="../js/search.js"></script>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      console.log('Checking session status...');
+      fetch('../php/check_session.php')
+        .then(response => response.json())
+        .then(data => {
+          console.log('Session data:', data);
+          const userLink = document.getElementById('userLink');
+          console.log('User link element:', userLink);
+
+          if (data.logged_in) {
+            console.log('User is logged in, updating link to Profile');
+            if (userLink) {
+              userLink.href = '../php/profile.php';
+              userLink.textContent = 'Profile';
+            }
+          } else {
+            console.log('User is not logged in');
+          }
+        })
+        .catch(error => {
+          console.error('Error checking session:', error);
+        });
+    });
+  </script>
 
 </body>
 </html>
