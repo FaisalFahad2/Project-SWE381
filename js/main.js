@@ -1,25 +1,6 @@
 window.addEventListener("load", () => {
   console.log('Main.js loaded');
   
-  // الحصول على كل أزرار التصويت
-  const upvoteButtons = document.querySelectorAll('.upvote');
-  const downvoteButtons = document.querySelectorAll('.downvote');
-
-  // إضافة أحداث التصويت للأزرار
-  upvoteButtons.forEach(button => {
-      button.addEventListener('click', function() {
-          const answerId = this.getAttribute('data-answer-id');
-          updateVote(answerId, 'upvote');
-      });
-  });
-
-  downvoteButtons.forEach(button => {
-      button.addEventListener('click', function() {
-          const answerId = this.getAttribute('data-answer-id');
-          updateVote(answerId, 'downvote');
-      });
-  });
-
   // دالة لتحديث التصويت في الخادم
   function updateVote(answerId, voteType) {
       const ratingElement = document.querySelector(`[data-answer-id="${answerId}"]`)?.closest('.answer')?.querySelector('.rating-value');

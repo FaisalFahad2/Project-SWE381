@@ -5,7 +5,7 @@ $db = Database::getInstance();
 $conn = $db->getConnection();
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     if (!isset($_SESSION['user_id'])) {
-        echo json_encode(['success' => false, 'error' => 'User must be logged in']);
+        echo json_encode(['error' => 'User must be logged in']);
         exit;
     }
 
@@ -21,7 +21,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $answer = $result->fetch_assoc();
 
     if (!$answer || $answer['user_id'] != $user_id) {
-        echo json_encode(['success' => false, 'error' => 'Unauthorized to edit this answer']);
+        echo json_encode(['error' => 'Unauthorized to edit this answer']);
         exit;
     }
 
@@ -29,9 +29,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $stmt->bind_param("sii", $content, $answer_id, $user_id);
     
     if ($stmt->execute()) {
-        echo json_encode(['success' => true, 'message' => 'Answer updated successfully']);
+        echo json_encode(['success' => 'Answer updated successfully']);
     } else {
-        echo json_encode(['success' => false, 'error' => $stmt->error]);
+        echo json_encode(['error' => $stmt->error]);
     }
     $stmt->close();
 }

@@ -24,33 +24,26 @@ function attachVoteHandlers() {
 }
 
 function updateVote(answerId, voteType, button) {
-const ratingElement = button.closest('.answer').querySelector('.rating-value');
-let currentRating = parseInt(ratingElement.textContent);
-
-fetch('../php/vote.php', {
-method: 'POST',
-headers: {
-    'Content-Type': 'application/x-www-form-urlencoded'
-},
-body: `answer_id=${answerId}&vote_type=${voteType}`
-})
-.then(response => response.json()) // 👈 نتوقع JSON بدل النص العادي
-.then(data => {
-if (data.status === 'success') {
-    // Get the question ID from the URL
-    const questionId = new URLSearchParams(window.location.search).get('id');
-    if (questionId) {
-        // Reload all answers to show updated votes
+  const questionId = new URLSearchParams(window.location.search).get('id');
+  fetch('../php/vote.php', {
+    method: 'POST',
+    headers: {
+        'Content-Type': 'application/x-www-form-urlencoded'
+    },
+    body: `answer_id=${answerId}&vote_type=${voteType}`
+  })
+  .then(response => response.json())
+  .then(data => {
+    if (data.status === 'success') {
+      // Reload answers to update UI and active state
+      if (typeof loadAnswers === 'function') {
         loadAnswers(questionId);
+      }
+    } else {
+      alert(data.message || 'Vote failed');
     }
-} else {
-    alert('You have already voted');
-
-    ratingElement.textContent = currentRating;
-}
-})
-.catch(error => {
-console.error('Error:', error);
-ratingElement.textContent = currentRating;
-});
+  })
+  .catch(error => {
+    console.error('Error:', error);
+  });
 }

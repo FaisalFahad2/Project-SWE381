@@ -14,7 +14,7 @@ try {
         error_log("Processing request for question_id: " . $question_id);
 
         // Get answers with user information
-        $answersQuery = "SELECT a.id, a.content, a.user_id, u.username as user 
+        $answersQuery = "SELECT a.id, a.content, a.user_id, a.created_at, u.username as user 
                         FROM answers a 
                         JOIN users u ON a.user_id = u.id 
                         WHERE a.question_id = ? 
@@ -59,6 +59,7 @@ try {
             $commentsResult = $commentStmt->get_result();
             $comments = array();
             while ($comment = $commentsResult->fetch_assoc()) {
+                $comment['is_owner'] = (isset($_SESSION['user_id']) && $_SESSION['user_id'] == $comment['user_id']);
                 $comments[] = $comment;
             }
             $commentStmt->close();
@@ -72,6 +73,20 @@ try {
             $ratingRow = $ratingResult->fetch_assoc();
             $answer['rating'] = $ratingRow['rating'] ?? 0;
             $ratingStmt->close();
+
+            // Add user_vote property
+            $user_vote = null;
+            if (isset($_SESSION['user_id'])) {
+                $voteStmt = $conn->prepare("SELECT vote_type FROM votes WHERE user_id = ? AND answer_id = ?");
+                $voteStmt->bind_param("ii", $_SESSION['user_id'], $answer['id']);
+                $voteStmt->execute();
+                $voteStmt->bind_result($voteType);
+                if ($voteStmt->fetch()) {
+                    $user_vote = $voteType;
+                }
+                $voteStmt->close();
+            }
+            $answer['user_vote'] = $user_vote;
 
             $answer['comments'] = $comments;
             $answer['is_owner'] = (isset($_SESSION['user_id']) && $_SESSION['user_id'] == $answer['user_id']);
@@ -101,6 +116,7 @@ try {
         $questionCommentsResult = $questionCommentStmt->get_result();
         $questionComments = array();
         while ($comment = $questionCommentsResult->fetch_assoc()) {
+            $comment['is_owner'] = (isset($_SESSION['user_id']) && $_SESSION['user_id'] == $comment['user_id']);
             $questionComments[] = $comment;
         }
         $questionCommentStmt->close();

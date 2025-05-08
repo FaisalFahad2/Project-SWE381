@@ -1,140 +1,90 @@
-window.addEventListener('load', function() {
-  // Check if user is logged in
-  if (!sessionStorage.getItem('user_id')) {
+// Check session and redirect if not logged in
+fetch('../php/check_session.php')
+  .then(response => response.json())
+  .then(data => {
+    if (!data.logged_in) {
       window.location.href = 'login.html';
       return;
-  }
-
-  const container = document.getElementById('myAnswersContainer');
-  
-  // Add heading
-  container.innerHTML = '<h2>My Answers</h2>';
-
-  // Fetch user's answers
-  fetch('../php/answer/get-my-answers.php')
-      .then(response => response.json())
-      .then(data => {
-          if (data.error) {
-              container.innerHTML = `<p class="error">${data.error}</p>`;
-              return;
-          }
-
-          if (data.length === 0) {
-              container.innerHTML = `<p>You haven't posted any answers yet.</p>`;
-              return;
-          }
-
-          // Create answers list
-          const answersList = document.createElement('div');
-          answersList.className = 'answers-list';
-
-          data.forEach(answer => {
-              const answerCard = document.createElement('div');
-              answerCard.className = 'answer-card';
-              answerCard.innerHTML = `
-                  <h3>
-                      <a href="question.html?id=${answer.question_id}">
-                          ${answer.question_title}
-                      </a>
-                  </h3>
-                  <div class="answer-content">${answer.content}</div>
-                  <div class="answer-meta">
-                      <span class="score">Score: ${answer.total_score}</span>
-                      <span class="date">Posted: ${new Date(answer.created_at).toLocaleDateString()}</span>
-                  </div>
-                  <div class="answer-actions">
-                      <button onclick="editAnswer(${answer.id})" class="edit-btn">Edit</button>
-                      <button onclick="deleteAnswer(${answer.id})" class="delete-btn">Delete</button>
-                  </div>
-              `;
-              answersList.appendChild(answerCard);
-          });
-
-          container.appendChild(answersList);
-      })
-      .catch(error => {
-          container.innerHTML = `<p class="error">Error loading answers: ${error.message}</p>`;
-      });
-});
-
-// Edit answer function
-function editAnswer(answerId) {
-  const answerCard = event.target.closest('.answer-card');
-  const contentDiv = answerCard.querySelector('.answer-content');
-  const currentContent = contentDiv.textContent;
-
-  // Create edit form
-  contentDiv.innerHTML = `
-      <textarea class="edit-textarea">${currentContent}</textarea>
-      <button onclick="saveAnswer(${answerId})" class="save-btn">Save</button>
-      <button onclick="cancelEdit(${answerId}, '${currentContent}')" class="cancel-btn">Cancel</button>
-  `;
-}
-
-// Save edited answer
-function saveAnswer(answerId) {
-  const answerCard = event.target.closest('.answer-card');
-  const newContent = answerCard.querySelector('.edit-textarea').value;
-
-  fetch('../php/answer/edit-answer.php', {
-      method: 'POST',
-      headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
-      },
-      body: `id=${answerId}&content=${encodeURIComponent(newContent)}`
-  })
-  .then(response => response.json())
-  .then(data => {
-      if (data.success) {
-          const contentDiv = answerCard.querySelector('.answer-content');
-          contentDiv.innerHTML = newContent;
-      } else {
-          alert('Error updating answer: ' + data.error);
-      }
+    }
+    loadMyAnswers();
   })
   .catch(error => {
-      alert('Error: ' + error.message);
+    console.error('Error checking session:', error);
   });
+
+function formatDate(dateString) {
+  if (!dateString) return "Unknown date";
+  const date = new Date(dateString);
+  if (isNaN(date)) return "Unknown date";
+  return date.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
 }
 
-// Cancel edit
-function cancelEdit(answerId, originalContent) {
-  const answerCard = event.target.closest('.answer-card');
-  const contentDiv = answerCard.querySelector('.answer-content');
-  contentDiv.innerHTML = originalContent;
+function loadMyAnswers() {
+  fetch('../php/get-my-answers.php')
+    .then(response => response.json())
+    .then(answers => {
+      const container = document.getElementById('myAnswersContainer');
+      container.innerHTML = ''; // Clear loading message
+
+      if (answers.length === 0) {
+        container.innerHTML = '<p class="no-answers">You haven\'t answered any questions yet.</p>';
+        return;
+      }
+
+      answers.forEach(answer => {
+        const answerDiv = document.createElement('div');
+        answerDiv.className = 'answer-item';
+        answerDiv.innerHTML = `
+          <div class="question-title">
+            <h3>Question: <a href="question.html?id=${answer.question_id}">${answer.question_title}</a></h3>
+          </div>
+          <div class="answer-content">
+            <p>${answer.content}</p>
+            <div class="answer-stats">
+              <span>Posted on ${formatDate(answer.created_at)}</span>
+            </div>
+          </div>
+          <div class="answer-actions">
+            <button onclick="editAnswer(${answer.id}, ${answer.question_id})" class="edit-btn">Edit</button>
+            <button onclick="deleteAnswer(${answer.id}, ${answer.question_id})" class="delete-btn">Delete</button>
+          </div>
+        `;
+        container.appendChild(answerDiv);
+      });
+    })
+    .catch(error => {
+      console.error('Error loading answers:', error);
+      document.getElementById('myAnswersContainer').innerHTML = 
+        '<p class="error">Error loading your answers. Please try again later.</p>';
+    });
 }
 
-// Delete answer
-function deleteAnswer(answerId) {
+function editAnswer(answerId, questionId) {
+  window.location.href = `question.html?id=${questionId}&answer=${answerId}&edit=true`;
+}
+
+function deleteAnswer(answerId, questionId) {
   if (!confirm('Are you sure you want to delete this answer?')) {
-      return;
+    return;
   }
 
-  fetch('../php/answer/delete-answer.php', {
-      method: 'POST',
-      headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
-      },
-      body: `id=${answerId}`
+  const formData = new FormData();
+  formData.append('id', answerId);
+
+  fetch('../php/delete-answer.php', {
+    method: 'POST',
+    body: formData
   })
   .then(response => response.json())
   .then(data => {
-      if (data.success) {
-          // Remove the answer card from DOM
-          const answerCard = event.target.closest('.answer-card');
-          answerCard.remove();
-          
-          // Check if there are any answers left
-          const answersList = document.querySelector('.answers-list');
-          if (!answersList.children.length) {
-              document.getElementById('myAnswersContainer').innerHTML = 
-                  `<p>You haven't posted any answers yet.</p>`;
-          }
-      } else {
-          alert('Error deleting answer: ' + data.error);
-      }
+    if (data.success) {
+      loadMyAnswers(); // Reload the list
+    } else {
+      alert(data.message || 'Error deleting answer');
+    }
   })
   .catch(error => {
-      alert('Error: ' + error.message);
+    console.error('Error:', error);
+    alert('Error deleting answer');
   });
 }

@@ -146,7 +146,6 @@ async function loadQuestions(term = '') {
     const response = await fetch(url);
     console.log('Response status:', response.status);
     console.log('Response headers:', Object.fromEntries(response.headers.entries()));
-    
     const text = await response.text();
     console.log('Raw response:', text);
     console.log('Response type:', typeof text);
@@ -154,71 +153,45 @@ async function loadQuestions(term = '') {
     
     // Try to find where the invalid content starts
     const jsonStart = text.indexOf('{');
-    console.log('JSON starts at position:', jsonStart);
-    if (jsonStart !== -1 && jsonStart > 0) {
-      console.log('Content before JSON:', text.substring(0, jsonStart));
-    }
-    
-    let data;
-    try {
-      data = JSON.parse(text);
-    } catch (parseError) {
-      console.error('JSON parse error:', parseError);
-      throw parseError;
-    }
-    
-    console.log('Parsed data:', data);
-    
-    if (!data || !data.questions || !Array.isArray(data.questions)) {
-      console.error('Invalid data format:', data);
-      const list = document.getElementById('questionList');
-      if (list) {
-        list.innerHTML = '<p>Error loading questions</p>';
+    const jsonStart2 = text.indexOf('[');
+    if (jsonStart !== -1 || jsonStart2 !== -1) {
+      const start = Math.min(jsonStart === -1 ? Infinity : jsonStart, jsonStart2 === -1 ? Infinity : jsonStart2);
+      console.log('JSON starts at position:', start);
+      if (start > 0) {
+        console.log('Content before JSON:', text.substring(0, start));
       }
-      return;
-    }
-
-    const list = document.getElementById('questionList');
-    if (!list) {
-      console.error('Question list element not found');
-      return;
     }
     
-    list.innerHTML = '';
+    const data = JSON.parse(text);
+    // Support both array and object with questions/data property
+    const questions = Array.isArray(data) ? data : (data.questions || data.data || []);
+    const container = document.getElementById('questionList');
+    container.innerHTML = '';
+    
     const currentUserId = sessionStorage.getItem('user_id');
     
-    data.questions.forEach(question => {
-      const questionElement = document.createElement('div');
-      questionElement.className = 'question';
-      const isOwner = currentUserId && question.user_id == currentUserId;
-      
-      let actionButtons = '';
-      if (isOwner) {
-        actionButtons = `
-          <div class="question-actions">
-            <button onclick="editQuestion(${question.id})">Edit</button>
-            <button onclick="deleteQuestion(${question.id})">Delete</button>
-          </div>
-        `;
-      }
-      
-      questionElement.innerHTML = `
-        <h3><a href="question.html?id=${question.id}">${question.title}</a></h3>
-        <p>${question.description}</p>
+    questions.forEach(q => {
+      const questionDiv = document.createElement('li');
+      questionDiv.className = 'question-item';
+      questionDiv.innerHTML = `
+        <h3><a href="question.html?id=${q.id}">${q.title}</a></h3>
         <div class="question-meta">
-          <span class="author">Asked by: ${question.username || 'Anonymous'}</span>
-          <span class="date">${new Date(question.created_at).toLocaleDateString()}</span>
+          <span>${q.answer_count} answers</span>
+          <span>${q.comment_count} comments</span>
+          <span>Posted on ${formatDate(q.created_at)}</span>
         </div>
-        ${actionButtons}
+        <p class="description">${q.description}</p>
+        <div class="question-actions">
+          <button onclick="editQuestion(${q.id})" class="edit-btn">Edit</button>
+          <button onclick="deleteQuestion(${q.id})" class="delete-btn">Delete</button>
+        </div>
       `;
-      list.appendChild(questionElement);
+      container.appendChild(questionDiv);
     });
   } catch (err) {
     console.error('Error loading questions:', err);
-    const list = document.getElementById('questionList');
-    if (list) {
-      list.innerHTML = '<li>Error loading questions. Check console for details.</li>';
-    }
+    const container = document.getElementById('questionList');
+    container.innerHTML = '<li>Error loading questions. Check console for details.</li>';
   }
 }
 
@@ -237,18 +210,32 @@ async function editQuestion(id) {
       body: fd 
     });
     
-    const data = await response.json();
+    console.log('Edit response status:', response.status);
+    console.log('Edit response headers:', Object.fromEntries(response.headers.entries()));
+    const text = await response.text();
+    console.log('Edit raw response:', text);
+    
+    // Try to find where the invalid content starts
+    const jsonStart = text.indexOf('{');
+    if (jsonStart !== -1) {
+      console.log('JSON starts at position:', jsonStart);
+      if (jsonStart > 0) {
+        console.log('Content before JSON:', text.substring(0, jsonStart));
+      }
+    }
+    
+    const q = JSON.parse(text);
     
     // Check if the current user owns this question
-    if (data.user_id != sessionStorage.getItem('user_id')) {
+    if (q.user_id != sessionStorage.getItem('user_id')) {
       alert('You can only edit your own questions.');
       return;
     }
     
     document.getElementById('modalTitle').textContent = 'Edit Question';
-    document.getElementById('questionId').value = data.id;
-    document.getElementById('questionTitle').value = data.title;
-    document.getElementById('questionDescription').value = data.description;
+    document.getElementById('questionId').value = q.id;
+    document.getElementById('questionTitle').value = q.title;
+    document.getElementById('questionDescription').value = q.description;
     document.body.style.overflow = 'hidden';
     document.getElementById('questionModal').style.display = 'flex';
   } catch (err) {
@@ -298,4 +285,12 @@ async function deleteQuestion(id) {
     console.error('Error deleting question:', err);
     alert('Error deleting question. Check console for details.');
   }
+}
+
+// Helper to format dates
+function formatDate(dateString) {
+  if (!dateString) return "Unknown date";
+  const date = new Date(dateString);
+  if (isNaN(date)) return "Unknown date";
+  return date.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
 }

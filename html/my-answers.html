@@ -10,52 +10,6 @@
   <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@200..1000&family=Heebo:wght@100..900&family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap" rel="stylesheet">
 </head>
 <body>
-  <script>
-    window.onload = function() {
-      fetch('../php/check_session.php')
-        .then(response => response.json())
-        .then(data => {
-          const userLink = document.getElementById('userLink');
-    
-          if (!data.logged_in) {
-            // Not logged in: if on index, redirect to login
-            if (window.location.pathname.indexOf('index.html') !== -1) {
-              window.location.href = 'login.html';
-            }
-          } else {
-            // Logged in: change the Login link to Profile link
-            if (userLink) {
-              userLink.href = '../php/profile.php'; // Redirect to profile page
-              userLink.textContent = 'Profile';     // Change link text to "Profile"
-            }
-            // Fetch answers for the current user
-            fetch('../php/get-answers.php')
-              .then(response => response.json())
-              .then(data => {
-                const myAnswers = data.answers.filter(a => a.user_id == data.user_id); 
-                const list = document.getElementById("myAnswerList");
-                list.innerHTML = ''; // Clear existing answers
-                myAnswers.forEach(answer => {
-                  let li = document.createElement("li");
-                  li.innerHTML = `
-                    <a href="question.html?id=${answer.question_id}" class="answer-link">
-                      <h3>Question: ${answer.question_title}</h3>
-                      <p>Your Answer: ${answer.content}</p>
-                    </a>
-                  `;
-                  list.appendChild(li);
-                });
-              })
-              .catch(error => {
-                console.error('Error fetching answers:', error);
-              });
-          }
-        })
-        .catch(error => {
-          console.error('Error checking session:', error);
-        });
-    };
-    </script>
   <header>
     <h1>StackClone</h1>
   
@@ -75,22 +29,19 @@
     </a>
 
     <a href="../php/profile.php" id="userLink">Profile</a>
-
   </header>
-
 
   <main>
     <div class="container">
       <h1>My Answers</h1>
-      <ul id="myAnswerList" class="answer-list">
-        <!-- User's answers loaded via AJAX -->
-      </ul>
+      <div id="myAnswersContainer" class="answers-list">
+        <p class="loading">Loading your answers...</p>
+      </div>
     </div>
   </main>
 
-
   <footer>
-  <p>&copy; 2025 StackClone</p>
+    <p>&copy; 2025 StackClone</p>
     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-twitter-x" viewBox="0 0 16 16">
       <path d="M12.6.75h2.454l-5.36 6.142L16 15.25h-4.937l-3.867-5.07-4.425 5.07H.316l5.733-6.57L0 .75h5.063l3.495 4.633L12.601.75Zm-.86 13.028h1.36L4.323 2.145H2.865z"/>
     </svg>
@@ -100,7 +51,6 @@
     </svg>
   </footer>
 
-  
-
+  <script src="../js/my-answers.js"></script>
 </body>
 </html>

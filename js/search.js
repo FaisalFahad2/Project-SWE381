@@ -33,20 +33,7 @@ if (window.location.pathname.includes('search-results.html')) {
           if (data.message) {
             resultsDiv.innerHTML = `<p>${data.message}</p>`;
           } else {
-            data.forEach(item => {
-              console.log("Result item:", item); 
-              resultsDiv.innerHTML += `
-                <div class="question">
-                  <a href="question.html?id=${item.id}">
-                    <p><b>Title:</b> ${item.title}</p>
-                  </a>
-                  <p><b>Question ID:</b> ${item.id}</p>
-                  <p><b>Description:</b> ${item.description}</p>
-                  <p><b>Created At:</b> ${item.created_at}</p>
-                  <hr>
-                </div>
-              `;
-            });
+            displayResults(data);
           }
         }
       });
@@ -56,4 +43,38 @@ if (window.location.pathname.includes('search-results.html')) {
       resultsDiv.innerHTML = '<p>No search term provided.</p>';
     }
   }
+}
+
+function displayResults(questions) {
+  // Support both array and object with questions/data property
+  if (!Array.isArray(questions)) {
+    questions = questions.questions || questions.data || [];
+  }
+  const results = document.getElementById('results');
+  results.innerHTML = '';
+  if (!questions.length) {
+    results.innerHTML = '<li>No results found.</li>';
+    return;
+  }
+  questions.forEach(q => {
+    const li = document.createElement('li');
+    li.className = 'question-item';
+    li.innerHTML = `
+      <h3><a href="question.html?id=${q.id}">${q.title}</a></h3>
+      <div class="question-meta">
+        <span>${q.answer_count} answers</span>
+        <span>${q.comment_count} comments</span>
+        <span>Posted on ${formatDate(q.created_at)}</span>
+      </div>
+      <p class="description">${q.description}</p>
+    `;
+    results.appendChild(li);
+  });
+}
+
+function formatDate(dateString) {
+  if (!dateString) return "Unknown date";
+  const date = new Date(dateString);
+  if (isNaN(date)) return "Unknown date";
+  return date.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
 }

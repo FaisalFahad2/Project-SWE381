@@ -1,4 +1,3 @@
-
 <?php
 session_start();
 session_unset();
@@ -42,8 +41,15 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
             VALUES ('$firstname', '$lastname', '$username', '$email', '$phone', '$hashed_password')";
 
     if ($conn->query($sql) === TRUE) {
+        // Get the user ID of the newly created user
+        $user_id = $conn->insert_id;
+        
+        // Keep existing session variables
         $_SESSION["registration_success"] = true;
         $_SESSION["username"] = $username;
+        // Add user_id to session
+        $_SESSION["user_id"] = $user_id;
+        
         header("Location: ../php/profile.php");
         exit();
     } else {
