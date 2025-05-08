@@ -666,11 +666,16 @@ main.profile-page .logout-button:hover {
   box-shadow: 0 1px 2px rgba(0,0,0,0.03);
   border-left: 4px solid var(--orange);
   position: relative;
+  padding-right: 120px;
 }
 .comment-meta {
   color: #888;
   font-size: 0.85rem;
   margin-bottom: 0.2rem;
+}
+
+.comment-content {
+  margin-right: 0.5rem;
 }
 
 .comment-actions {
@@ -684,11 +689,12 @@ main.profile-page .logout-button:hover {
   background: transparent;
   border: none;
   color: #888;
-  font-size: 1rem;
+  font-size: 0.85rem;
   padding: 2px 6px;
   border-radius: 4px;
   cursor: pointer;
   transition: background 0.15s, color 0.15s;
+  white-space: nowrap;
 }
 .comment-action-btn:hover {
   background: var(--orange);

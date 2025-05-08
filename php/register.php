@@ -44,7 +44,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
     if ($conn->query($sql) === TRUE) {
         $_SESSION["registration_success"] = true;
         $_SESSION["username"] = $username;
-        header("Location: ../php/profile.php");
+        header("Location: ../html/login.html");
         exit();
     } else {
         $_SESSION['error'] = "Error: " . $sql . "<br>" . $conn->error;

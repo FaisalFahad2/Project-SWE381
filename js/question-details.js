@@ -465,16 +465,16 @@ function attachCommentEditDeleteHandlers(questionId) {
   document.querySelectorAll('.edit-comment-btn').forEach(btn => {
     btn.onclick = function() {
       const commentId = btn.getAttribute('data-comment-id');
-      const commentP = btn.closest('p');
-      const contentSpan = commentP.querySelector('.comment-content');
-      const oldContent = contentSpan.textContent;
-      contentSpan.innerHTML = `<textarea class="edit-comment-textarea" style="width:60%;">${oldContent}</textarea>
+      const commentDiv = btn.closest('.comment-card');
+      const contentDiv = commentDiv.querySelector('.comment-content');
+      const oldContent = contentDiv.textContent;
+      contentDiv.innerHTML = `<textarea class="edit-comment-textarea" style="width:100%;">${oldContent}</textarea>
         <button class="save-edit-comment-btn">Save</button>
         <button class="cancel-edit-comment-btn">Cancel</button>`;
-      const saveBtn = commentP.querySelector('.save-edit-comment-btn');
-      const cancelBtn = commentP.querySelector('.cancel-edit-comment-btn');
+      const saveBtn = contentDiv.querySelector('.save-edit-comment-btn');
+      const cancelBtn = contentDiv.querySelector('.cancel-edit-comment-btn');
       saveBtn.onclick = function() {
-        const newContent = commentP.querySelector('.edit-comment-textarea').value;
+        const newContent = contentDiv.querySelector('.edit-comment-textarea').value;
         fetch('../php/edit-comment.php', {
           method: 'POST',
           headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
@@ -483,14 +483,14 @@ function attachCommentEditDeleteHandlers(questionId) {
         .then(res => res.json())
         .then(data => {
           if (data.success) {
-            contentSpan.textContent = newContent;
+            contentDiv.textContent = newContent;
           } else {
             alert('Error: ' + (data.error || 'Failed to edit comment'));
           }
         });
       };
       cancelBtn.onclick = function() {
-        contentSpan.textContent = oldContent;
+        contentDiv.textContent = oldContent;
       };
     };
   });
@@ -508,7 +508,7 @@ function attachCommentEditDeleteHandlers(questionId) {
       .then(data => {
         if (data.success) {
           // Remove the comment div
-          const commentDiv = btn.closest('div.comment-card');
+          const commentDiv = btn.closest('.comment-card');
           if (commentDiv) commentDiv.remove();
         } else {
           alert('Error: ' + (data.error || 'Failed to delete comment'));
