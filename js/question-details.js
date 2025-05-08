@@ -296,17 +296,24 @@ function setupAnswerModal() {
 
 // --- Voting Logic ---
 function vote(answerId, type, btn) {
+  btn.disabled = true; // Disable the clicked button
+  const siblingBtn = type === 'up'
+    ? btn.parentElement.querySelector('.downvote')
+    : btn.parentElement.querySelector('.upvote');
+  if (siblingBtn) siblingBtn.disabled = true;
+
   fetch('../php/vote.php', {
     method: 'POST',
     body: new URLSearchParams({ answer_id: answerId, vote_type: type })
   })
-  .then(res => res.json())
+  .then(res => {
+    if (!res.ok) throw new Error('Network response was not ok');
+    return res.json();
+  })
   .then(data => {
-    if (data.success) {
-      // Update the rating value in the DOM
+    if (data.status === 'success') {
       const ratingSpan = btn.parentElement.querySelector('.rating-value');
-      if (ratingSpan) ratingSpan.textContent = data.rating;
-      // Highlight active button
+      if (ratingSpan) ratingSpan.textContent = data.new_rating;
       btn.classList.add('active');
       if (type === 'up') {
         btn.parentElement.querySelector('.downvote').classList.remove('active');
@@ -316,6 +323,13 @@ function vote(answerId, type, btn) {
     } else {
       alert(data.message || 'Vote failed');
     }
+  })
+  .catch((error) => {
+    alert('Vote failed: ' + (error.message || 'Unknown error'));
+  })
+  .finally(() => {
+    btn.disabled = false;
+    if (siblingBtn) siblingBtn.disabled = false;
   });
 }
 
